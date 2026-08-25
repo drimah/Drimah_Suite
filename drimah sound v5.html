@@ -1,0 +1,3620 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drimah Sound — Sem Título</title>
+<link rel="icon" type="image/x-icon" href="drimahsound.ico">
+<link rel="shortcut icon" href="drimahsound.ico">
+
+<!-- Bibliotecas -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
+
+<style>
+  :root {
+    --bg-0: #1a1a1a;
+    --bg-1: #2d2d2d;
+    --bg-2: #383838;
+    --bg-3: #444444;
+    --bg-hover: #4a4a4a;
+    --border: rgba(255,255,255,0.06);
+    --border-strong: rgba(255,255,255,0.1);
+    
+    --text-1: #ffffff;
+    --text-2: #ffffff;
+    --text-3: #ffffff;
+    
+    --accent: #f57900;
+    --accent-dark: #cc5f00;
+    --accent-light: #ff9a44;
+    --accent-soft: rgba(245, 121, 0, 0.15);
+    --accent-glow: 0 0 30px rgba(245, 121, 0, 0.12);
+    
+    --icon: #ffffff;
+    
+    --modal-header-bg: rgba(0,0,0,0.3);
+    --modal-body-bg: rgba(255,255,255,0.04);
+    --modal-radius: 16px;
+    --modal-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    --input-radius: 10px;
+    --btn-radius: 50px;
+    
+    --track-height: 80px;
+    --timeline-height: 400px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+    background: var(--bg-0);
+    color: var(--text-1);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .icon {
+    width: 20px; height: 20px;
+    stroke: var(--icon);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    flex-shrink: 0;
+  }
+  .icon-sm { 
+    width: 14px; 
+    height: 14px; 
+    stroke-width: 1.6;
+  }
+  .icon-lg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 1.8;
+  }
+
+  .header, .menubar, .toolbar, .explorer {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+
+  .header {
+    background: var(--bg-1);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+    position: relative;
+    z-index: 100;
+  }
+
+  .brand-logo { height: 40px; width: auto; }
+  .brand-name {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text-1);
+    text-shadow: 0 0 30px rgba(245, 121, 0, 0.08);
+  }
+  
+  .project-title {
+    font-family: 'Georgia', serif;
+    font-size: 20px;
+    font-weight: 300;
+    color: var(--text-2);
+    opacity: 0.8;
+    margin-left: auto;
+    margin-right: 16px;
+  }
+
+  .menubar {
+    background: var(--bg-1);
+    height: 34px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-2);
+    position: relative;
+    z-index: 99;
+  }
+
+  .menu-wrapper {
+    position: relative;
+    display: inline-block;
+    height: 100%;
+  }
+
+  .menu-item {
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    color: var(--text-2);
+    transition: color 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    user-select: none;
+  }
+  .menu-item:hover { 
+    background: var(--accent-soft); 
+    color: var(--text-1);
+  }
+
+  .menu-wrapper .dropdown {
+    display: none;
+    position: fixed;
+    top: 90px;
+    background: var(--bg-2);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    min-width: 260px;
+    padding: 6px;
+    z-index: 999999 !important;
+    box-shadow: 0 8px 48px rgba(0,0,0,0.7);
+    animation: slideDown 0.2s ease;
+  }
+  
+  .menu-wrapper:nth-child(1) .dropdown { left: 8px; }
+  .menu-wrapper:nth-child(2) .dropdown { left: 80px; }
+  .menu-wrapper:nth-child(3) .dropdown { left: 148px; }
+  .menu-wrapper:nth-child(4) .dropdown { left: 208px; }
+  .menu-wrapper:nth-child(5) .dropdown { left: 278px; }
+  .menu-wrapper:nth-child(6) .dropdown { left: 348px; }
+  
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .dropdown-item {
+    padding: 8px 14px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    color: var(--text-2);
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+  .dropdown-item:hover { 
+    background: var(--accent-soft); 
+    color: var(--accent-light);
+  }
+  .dropdown-item .shortcut {
+    color: var(--text-3);
+    font-size: 11px;
+    margin-left: 24px;
+    font-family: 'SF Mono', monospace;
+  }
+  .separator { height: 1px; background: var(--border); margin: 4px 8px; }
+
+  .lang-submenu { position: relative; }
+  .lang-submenu .lang-dropdown {
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: var(--bg-2);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    min-width: 180px;
+    padding: 6px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    z-index: 999999 !important;
+  }
+  .lang-submenu:hover > .lang-dropdown { display: block; }
+
+  .toolbar {
+    background: var(--bg-1);
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    z-index: 10;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .tool-btn {
+    width: 36px; height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+    background: transparent;
+    position: relative;
+    flex-shrink: 0;
+  }
+  
+  .tool-btn svg,
+  .tool-btn svg *,
+  .tool-btn .icon,
+  .tool-btn .icon * {
+    stroke: #ffffff !important;
+    fill: none !important;
+    color: #ffffff !important;
+  }
+
+  .tool-btn:hover { 
+    background: var(--accent-soft); 
+  }
+  .tool-btn:hover svg,
+  .tool-btn:hover svg *,
+  .tool-btn:hover .icon,
+  .tool-btn:hover .icon * {
+    stroke: var(--accent-light) !important;
+  }
+
+  .tool-btn:active { background: var(--bg-hover); transform: scale(0.95); }
+  .tool-btn.active { 
+    background: var(--accent-soft); 
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+  }
+  .tool-btn.active svg,
+  .tool-btn.active svg *,
+  .tool-btn.active .icon,
+  /* Tooltips da barra principal — preservam a chave de tradução */
+  .tool-btn[data-tooltip] {
+    position: relative;
+  }
+  .tool-btn[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 8px);
+    transform: translateX(-50%) translateY(-2px);
+    padding: 6px 9px;
+    border-radius: 7px;
+    background: var(--bg-2);
+    color: var(--text-1);
+    border: 1px solid var(--border-strong);
+    box-shadow: 0 4px 14px rgba(0,0,0,.28);
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 10000;
+    transition: opacity .15s ease, transform .15s ease;
+  }
+  .tool-btn[data-tooltip]:hover::after,
+  .tool-btn[data-tooltip]:focus-visible::after {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .tool-btn.active .icon * {
+    stroke: var(--accent-light) !important;
+  }
+  .tool-btn.recording {
+    background: rgba(255, 0, 0, 0.2);
+    border: 1.5px solid #ff0000;
+    animation: pulse 1s infinite;
+  }
+  .tool-btn.recording svg,
+  .tool-btn.recording svg * {
+    stroke: #ff0000 !important;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .tool-sep { width: 1px; height: 26px; background: var(--border); margin: 0 8px; flex-shrink: 0; }
+
+  .main { flex: 1; display: flex; overflow: hidden; }
+
+  .explorer {
+    width: 200px;
+    background: var(--bg-1);
+    backdrop-filter: blur(8px);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 5;
+  }
+
+  .explorer-header {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .explorer-header-bar {
+    background: var(--accent);
+    height: 26px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.02em;
+  }
+
+  .explorer-content { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 6px 4px;
+  }
+
+  .track-item {
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-2);
+    background: rgba(255,255,255,0.02);
+    transition: all 0.15s;
+    font-size: 12px;
+    border: 1px solid transparent;
+  }
+  .track-item:hover { 
+    background: var(--accent-soft); 
+    color: var(--text-1);
+  }
+  .track-item.active { 
+    background: var(--accent-soft); 
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .track-item .track-number { 
+    font-weight: 600; 
+    min-width: 20px; 
+    color: var(--text-3);
+    font-size: 10px;
+  }
+  .track-item .track-name { 
+    flex: 1; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .track-item .track-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .track-item .track-controls button {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: all 0.15s;
+  }
+  .track-item .track-controls button:hover {
+    color: var(--text-1);
+    background: var(--accent-soft);
+  }
+  .track-item .track-controls button.muted {
+    color: #ff4444;
+  }
+  .track-item .track-controls button.solo {
+    color: #44ff44;
+  }
+  .track-item .track-gain {
+    width: 50px;
+    height: 4px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: var(--bg-3);
+    border-radius: 2px;
+    outline: none;
+  }
+  .track-item .track-gain::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .track-item .track-gain::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  .explorer-actions {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 4px 8px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .explorer-actions button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent !important;
+    color: #ffffff !important;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    padding: 4px;
+  }
+  
+  .explorer-actions button svg {
+    stroke: #ffffff !important;
+    stroke-width: 1.5;
+    fill: none;
+    width: 16px;
+    height: 16px;
+  }
+  
+  .explorer-actions button:hover {
+    background: var(--accent-soft) !important;
+  }
+  
+  .explorer-actions button:hover svg {
+    stroke: var(--accent-light) !important;
+  }
+
+  .editor-area { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column; 
+    background: var(--bg-0);
+    overflow: hidden; 
+  }
+
+  .timeline-container { 
+    flex: 1; 
+    overflow: auto;
+    padding: 10px 20px;
+    position: relative;
+  }
+
+  .timeline-ruler {
+    height: 30px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 10px;
+    font-size: 10px;
+    color: var(--text-3);
+    font-family: 'SF Mono', monospace;
+    position: relative;
+  }
+
+  .timeline-ruler .marker {
+    position: absolute;
+    bottom: 0;
+    height: 20px;
+    border-left: 1px solid var(--border-strong);
+    padding-left: 4px;
+    font-size: 9px;
+    color: var(--text-3);
+  }
+
+  .timeline-tracks {
+    position: relative;
+    padding-top: 4px;
+  }
+
+  .track-row {
+    height: var(--track-height, 80px);
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .track-row:hover {
+    background: var(--bg-2);
+  }
+  .track-row.selected {
+    background: var(--accent-soft);
+    border-left: 3px solid var(--accent);
+  }
+
+  .track-row canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .track-row .track-label {
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    font-size: 10px;
+    color: var(--text-3);
+    background: var(--bg-0);
+    padding: 2px 8px;
+    border-radius: 4px;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 2;
+    font-family: 'SF Mono', monospace;
+  }
+
+  .track-row .track-duration {
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+    font-size: 10px;
+    color: var(--text-3);
+    background: var(--bg-0);
+    padding: 2px 6px;
+    border-radius: 4px;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: 2;
+    font-family: 'SF Mono', monospace;
+  }
+
+  .playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    z-index: 5;
+    pointer-events: none;
+    left: 0;
+    transition: left 0.05s linear;
+    box-shadow: 0 0 8px rgba(245, 121, 0, 0.3);
+  }
+  .playhead::after {
+    content: '▼';
+    position: absolute;
+    top: -12px;
+    left: -6px;
+    font-size: 10px;
+    color: var(--accent);
+  }
+
+  .selection-overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background: rgba(245, 121, 0, 0.15);
+    border: 1px solid var(--accent);
+    z-index: 3;
+    pointer-events: none;
+    display: none;
+  }
+
+  .statusbar {
+    background: var(--bg-1);
+    backdrop-filter: blur(8px);
+    height: 26px;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    font-size: 11.5px;
+    color: var(--text-3);
+    border-top: 1px solid var(--border);
+    justify-content: space-between;
+    position: relative;
+    z-index: 5;
+  }
+  .status-indicators { display: flex; gap: 18px; }
+  .status-ind b { color: var(--text-2); font-weight: 500; }
+
+  /* Modais */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: fadeIn 0.25s ease;
+  }
+  .modal-overlay.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes modalSlideUp {
+    from { opacity: 0; transform: translateY(30px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .modal {
+    background: var(--bg-2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--modal-radius, 16px);
+    min-width: 400px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--modal-shadow, 0 20px 60px rgba(0,0,0,0.6));
+    animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+  }
+  
+  .modal-header {
+    background: var(--modal-header-bg, rgba(0,0,0,0.3));
+    padding: 20px 26px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .modal-header h2 {
+    color: var(--text-1);
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.3px;
+  }
+  
+  .modal-header .modal-close-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+    color: var(--text-3);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .modal-header .modal-close-btn:hover {
+    background: rgba(255,255,255,0.12);
+    color: var(--text-1);
+  }
+  
+  .modal-body {
+    background: var(--modal-body-bg, rgba(255,255,255,0.04));
+    padding: 24px 26px 20px;
+  }
+  
+  .modal-body p { 
+    margin-bottom: 12px; 
+    line-height: 1.6; 
+    color: var(--text-2); 
+    font-size: 14px; 
+    text-align: center;
+  }
+  
+  .modal-footer {
+    background: var(--modal-header-bg, rgba(0,0,0,0.2));
+    padding: 14px 26px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .modal-footer-center {
+    justify-content: center;
+  }
+
+  .modal-body input, 
+  .modal-body textarea, 
+  .modal-body select {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1.5px solid var(--border);
+    border-radius: var(--input-radius, 10px);
+    color: var(--text-1);
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s;
+    outline: none;
+  }
+  
+  .modal-body input:focus,
+  .modal-body textarea:focus,
+  .modal-body select:focus {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.08);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  
+  .modal-body input::placeholder,
+  .modal-body textarea::placeholder {
+    color: var(--text-3);
+    opacity: 0.6;
+  }
+  
+  .modal-body textarea {
+    min-height: 90px;
+    resize: vertical;
+  }
+  
+  .modal-body label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: var(--text-2);
+    font-size: 13px;
+    letter-spacing: 0.3px;
+  }
+  
+  .modal-input-group {
+    margin-bottom: 16px;
+  }
+  .modal-input-group:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .btn { 
+    padding: 10px 24px; 
+    border: none; 
+    border-radius: var(--btn-radius, 50px) !important;
+    cursor: pointer; 
+    font-size: 13px; 
+    font-weight: 500; 
+    transition: all 0.25s ease;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  
+  .btn-primary { 
+    background: var(--accent); 
+    color: #fff; 
+    box-shadow: 0 4px 12px rgba(245, 121, 0, 0.3);
+  }
+  .btn-primary:hover { 
+    background: var(--accent-light); 
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(245, 121, 0, 0.4);
+  }
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+  
+  .btn-secondary { 
+    background: rgba(255,255,255,0.08); 
+    color: var(--text-2); 
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { 
+    background: rgba(255,255,255,0.15); 
+    color: var(--text-1);
+    transform: translateY(-1px);
+  }
+  
+  .btn-danger {
+    background: #dc3545;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+  }
+  .btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+  }
+
+  .modal-about-logo {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .modal-about-logo img {
+    height: 80px;
+    width: auto;
+    border-radius: 12px;
+  }
+  .modal-about-title {
+    font-family: 'Georgia', serif;
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--text-1);
+    text-align: center;
+  }
+  .modal-about-accent {
+    color: var(--accent);
+  }
+
+  /* Light mode */
+  body.light-mode {
+    --bg-0: #f0f0f0;
+    --bg-1: #ffffff;
+    --bg-2: #f8f8f8;
+    --bg-3: #e8e8e8;
+    --bg-hover: #e0e0e0;
+    --border: rgba(0,0,0,0.06);
+    --border-strong: rgba(0,0,0,0.1);
+    
+    --text-1: #1a1a1a;
+    --text-2: #333333;
+    --text-3: #888888;
+    
+    --accent: #f57900;
+    --accent-dark: #cc5f00;
+    --accent-light: #ff9a44;
+    --accent-soft: rgba(245, 121, 0, 0.12);
+    --accent-glow: 0 0 30px rgba(245, 121, 0, 0.08);
+    
+    --icon: #333333;
+    
+    --modal-header-bg: rgba(0,0,0,0.04);
+    --modal-body-bg: rgba(255,255,255,0.5);
+    --modal-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  body.light-mode .header,
+  body.light-mode .menubar,
+  body.light-mode .toolbar,
+  body.light-mode .explorer,
+  body.light-mode .modal {
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(0,0,0,0.04);
+  }
+
+  body.light-mode .tool-btn svg,
+  body.light-mode .tool-btn svg *,
+  body.light-mode .tool-btn .icon,
+  body.light-mode .tool-btn .icon * {
+    stroke: #333333 !important;
+  }
+
+  body.light-mode .track-row {
+    background: rgba(0,0,0,0.03);
+  }
+  body.light-mode .track-row:hover {
+    background: rgba(0,0,0,0.06);
+  }
+  body.light-mode .track-row.selected {
+    background: var(--accent-soft);
+  }
+
+  body.light-mode .explorer-actions button svg {
+    stroke: #333333 !important;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg-0); }
+  ::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+  /* Temas */
+  body[data-theme="dark"] { --bg-0: #0f0f0f; --bg-1: #1a1a1a; --bg-2: #252525; --bg-3: #333333; --bg-hover: #404040; }
+  body[data-theme="midnight"] { --bg-0: #0d1525; --bg-1: #162036; --bg-2: #1e2d4a; --bg-3: #2a3d5e; --bg-hover: #354a70; --accent: #5b9cf5; --accent-light: #7ab8ff; --accent-soft: rgba(91,156,245,0.18); }
+  body[data-theme="forest"] { --bg-0: #0f1f14; --bg-1: #162d1e; --bg-2: #1f3d28; --bg-3: #2a5035; --bg-hover: #356342; --accent: #4cd97a; --accent-light: #6ef09a; --accent-soft: rgba(76,217,122,0.18); }
+  body[data-theme="purple"] { --bg-0: #1a1028; --bg-1: #25183a; --bg-2: #35224d; --bg-3: #462e60; --bg-hover: #573a73; --accent: #b57cf5; --accent-light: #cca0f5; --accent-soft: rgba(181,124,245,0.18); }
+  body[data-theme="coffee"] { --bg-0: #1f1410; --bg-1: #2e1e16; --bg-2: #3e2a1e; --bg-3: #503826; --bg-hover: #624630; --accent: #d49a6a; --accent-light: #e8b88a; --accent-soft: rgba(212,154,106,0.18); }
+  body[data-theme="metallic"] { --bg-0: #1e1e24; --bg-1: #2a2a34; --bg-2: #3a3a48; --bg-3: #4a4a5c; --bg-hover: #5a5a70; --accent: #a0a8b8; --accent-light: #b8c0d0; --accent-soft: rgba(160,168,184,0.18); }
+  body[data-theme="ocean"] { --bg-0: #0a1f33; --bg-1: #0f2e4d; --bg-2: #163d66; --bg-3: #1e4d80; --bg-hover: #265c99; --accent: #4da6ff; --accent-light: #6ebfff; --accent-soft: rgba(77,166,255,0.18); }
+  body[data-theme="sunset"] { --bg-0: #1f1010; --bg-1: #331818; --bg-2: #4a2020; --bg-3: #5e2a2a; --bg-hover: #733535; --accent: #ff7a5c; --accent-light: #ff9a7a; --accent-soft: rgba(255,122,92,0.18); }
+  body[data-theme="mint"] { --bg-0: #0f1f18; --bg-1: #162e24; --bg-2: #1f3d30; --bg-3: #2a503e; --bg-hover: #35634c; --accent: #4dd9a0; --accent-light: #6ef0b8; --accent-soft: rgba(77,217,160,0.18); }
+  body[data-theme="rose"] { --bg-0: #1f1018; --bg-1: #331828; --bg-2: #4a2038; --bg-3: #5e2a48; --bg-hover: #733558; --accent: #f57ab8; --accent-light: #ff9ad0; --accent-soft: rgba(245,122,184,0.18); }
+  body[data-theme="pride"] { --bg-0: #ffffff; --bg-1: #ffffff; --bg-2: #f8f8f8; --bg-3: #f0f0f0; --bg-hover: #e8e8e8; --border: rgba(200,200,200,0.30); --border-strong: rgba(200,200,200,0.50); --accent: #ff5722; --accent-light: #ff8a65; --accent-soft: rgba(255,87,34,0.15); --text-1: #1a1a1a; --text-2: #333; --text-3: #888; --icon: #333; }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* VU Meter */
+  .vu-meter {
+    position: absolute;
+    right: 50px;
+    top: 10px;
+    bottom: 10px;
+    width: 6px;
+    background: var(--bg-3);
+    border-radius: 3px;
+    overflow: hidden;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .vu-meter .vu-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--accent);
+    transition: height 0.05s linear;
+    border-radius: 3px;
+  }
+  
+  /* Voice selector - CORRIGIDO - fundo escuro com texto claro */
+  .voice-select-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .voice-select-group select {
+    flex: 1;
+    min-width: 120px;
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #444444;
+    border-radius: var(--input-radius, 10px);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s;
+    appearance: auto;
+  }
+  .voice-select-group select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .voice-select-group select option {
+    background: #2d2d2d;
+    color: #ffffff;
+    padding: 6px;
+  }
+  .voice-preview-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+  .voice-name-display {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #888888;
+    padding: 6px 12px;
+    background: #2d2d2d;
+    border-radius: var(--input-radius);
+    border: 1px solid #444444;
+  }
+
+  .voice-status {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #888888;
+    text-align: center;
+    min-height: 20px;
+  }
+  
+  /* Estilos para selects dentro do modal */
+  .modal-body select {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #444444;
+    padding: 10px 14px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 14px;
+    appearance: auto;
+  }
+  .modal-body select option {
+    background: #2d2d2d;
+    color: #ffffff;
+    padding: 6px;
+  }
+  .modal-body select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  
+  .modal-body input,
+  .modal-body textarea {
+    background: #2d2d2d;
+    color: #ffffff;
+    border: 1px solid #444444;
+    padding: 10px 14px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 14px;
+  }
+  .modal-body input:focus,
+  .modal-body textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  
+  #pollinationsConfig .modal-input-group {
+    margin-bottom: 6px;
+  }
+
+  .preset-panel{padding:4px 2px 2px}.preset-subtitle{font-size:12px;color:var(--text-3);margin:0 0 10px;text-transform:uppercase;letter-spacing:.08em}.preset-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.modal-choice-btn{display:flex;align-items:center;justify-content:flex-start;gap:10px;width:100%;padding:12px 14px;border:1px solid var(--border-strong);border-radius:var(--btn-radius);background:var(--bg-2);color:var(--text-1);cursor:pointer;transition:.2s}.modal-choice-btn:hover{background:var(--bg-hover);border-color:var(--accent);transform:translateY(-1px)}.modal-choice-btn.active{background:var(--accent-soft);border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}.preset-help{margin:14px 2px 2px;color:var(--text-3);font-size:12px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- SVG Icons -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="i-play" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21" stroke-width="1.8"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" stroke-width="1.8"/><rect x="14" y="4" width="4" height="16" stroke-width="1.8"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" stroke-width="1.8"/></symbol>
+    <symbol id="i-record" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+    <symbol id="i-export" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="i-import" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></symbol>
+    <symbol id="i-add" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-delete" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+    <symbol id="i-paste" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13"/></symbol>
+    <symbol id="i-zoom-in" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></symbol>
+    <symbol id="i-zoom-out" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></symbol>
+    <symbol id="i-loop" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="i-speed" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></symbol>
+    <symbol id="i-voice" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/><circle cx="7" cy="6" r="1.5"/><circle cx="17" cy="12" r="1.5"/><circle cx="12" cy="18" r="1.5"/></symbol>
+    <symbol id="i-effects" viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h5M8 16h8"/><circle cx="16" cy="12" r="1.2"/></symbol>
+    <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></symbol>
+    <symbol id="i-voice-male" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/><circle cx="18" cy="6" r="2" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-voice-female" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/><circle cx="18" cy="6" r="2" fill="currentColor" stroke="none"/><path d="M16 4l2-2 2 2" stroke="none" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<!-- ==================== HEADER ==================== -->
+<div class="header">
+  <img src="drimahsound.png" alt="Logo Drimah Sound" class="brand-logo" id="headerLogo">
+  <div class="brand-name">Drimah Sound</div>
+  <span class="project-title" id="projectTitleDisplay">Sem Título</span>
+</div>
+
+<!-- ==================== MENUBAR ==================== -->
+<div class="menubar">
+  <div class="menu-wrapper">
+    <div class="menu-item" onclick="toggleMenu('dropdown-file')"><span data-i18n="menuFile">Arquivo</span></div>
+    <div class="dropdown" id="dropdown-file">
+      <div class="dropdown-item" onclick="newProject();closeAllMenus()"><span data-i18n="new">Novo Projeto</span> <span class="shortcut">Ctrl+N</span></div>
+      <div class="dropdown-item" onclick="openProject();closeAllMenus()"><span data-i18n="open">Abrir...</span> <span class="shortcut">Ctrl+O</span></div>
+      <div class="dropdown-item" onclick="saveProject();closeAllMenus()"><span data-i18n="save">Salvar</span> <span class="shortcut">Ctrl+S</span></div>
+      <div class="dropdown-item" onclick="saveProjectAs();closeAllMenus()"><span data-i18n="saveAs">Salvar Como...</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="importAudio();closeAllMenus()"><span data-i18n="importAudio">Importar Áudio</span> <span class="shortcut">Ctrl+I</span></div>
+      <div class="dropdown-item" onclick="exportAudio();closeAllMenus()"><span data-i18n="exportAudio">Exportar Áudio</span> <span class="shortcut">Ctrl+E</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="closeApp();closeAllMenus()"><span data-i18n="exit">Sair</span> <span class="shortcut">Ctrl+Q</span></div>
+    </div>
+  </div>
+
+  <div class="menu-wrapper">
+    <div class="menu-item" onclick="toggleMenu('dropdown-edit')"><span data-i18n="menuEdit">Editar</span></div>
+    <div class="dropdown" id="dropdown-edit">
+      <div class="dropdown-item" onclick="undoAction();closeAllMenus()"><span data-i18n="undo">Desfazer</span> <span class="shortcut">Ctrl+Z</span></div>
+      <div class="dropdown-item" onclick="redoAction();closeAllMenus()"><span data-i18n="redo">Refazer</span> <span class="shortcut">Ctrl+Y</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="cutSelection();closeAllMenus()"><span data-i18n="cut">Cortar</span> <span class="shortcut">Ctrl+X</span></div>
+      <div class="dropdown-item" onclick="copySelection();closeAllMenus()"><span data-i18n="copy">Copiar</span> <span class="shortcut">Ctrl+C</span></div>
+      <div class="dropdown-item" onclick="pasteClipboard();closeAllMenus()"><span data-i18n="paste">Colar</span> <span class="shortcut">Ctrl+V</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="deleteSelection();closeAllMenus()"><span data-i18n="delete">Deletar</span> <span class="shortcut">Delete</span></div>
+    </div>
+  </div>
+
+  <div class="menu-wrapper">
+    <div class="menu-item" onclick="toggleMenu('dropdown-view')"><span data-i18n="menuView">Exibir</span></div>
+    <div class="dropdown" id="dropdown-view">
+      <div class="dropdown-item" onclick="toggleExplorer();closeAllMenus()"><span data-i18n="toggleExplorer">Alternar Explorador</span></div>
+      <div class="dropdown-item" onclick="toggleTheme();closeAllMenus()"><span data-i18n="toggleTheme">Alternar Tema</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="zoomIn();closeAllMenus()"><span data-i18n="zoomIn">Aumentar Zoom</span> <span class="shortcut">Ctrl++</span></div>
+      <div class="dropdown-item" onclick="zoomOut();closeAllMenus()"><span data-i18n="zoomOut">Diminuir Zoom</span> <span class="shortcut">Ctrl+-</span></div>
+    </div>
+  </div>
+
+  <div class="menu-wrapper">
+    <div class="menu-item" onclick="toggleMenu('dropdown-insert')"><span data-i18n="menuInsert">Inserir</span></div>
+    <div class="dropdown" id="dropdown-insert">
+      <div class="dropdown-item" onclick="addTrack();closeAllMenus()"><span data-i18n="addTrack">Nova Faixa</span> <span class="shortcut">Ctrl+T</span></div>
+      <div class="dropdown-item" onclick="recordTrack();closeAllMenus()"><span data-i18n="recordTrack">Gravar Faixa</span> <span class="shortcut">Ctrl+R</span></div>
+      <div class="dropdown-item" onclick="voicebox();closeAllMenus()"><span data-i18n="voicebox">Voz</span> <span class="shortcut">Ctrl+V</span></div>
+    </div>
+  </div>
+
+  <div class="menu-wrapper">
+    <div class="menu-item" onclick="toggleMenu('dropdown-settings')"><span data-i18n="menuSettings">Configurações</span></div>
+    <div class="dropdown" id="dropdown-settings">
+      <div class="dropdown-item lang-submenu">
+        <span data-i18n="themes">Temas</span>
+        <div class="lang-dropdown" id="themeDropdown">
+          <div class="dropdown-item" onclick="applyTheme('default');closeAllMenus()">Padrão</div>
+          <div class="dropdown-item" onclick="applyTheme('dark');closeAllMenus()">Escuro</div>
+          <div class="dropdown-item" onclick="applyTheme('midnight');closeAllMenus()">Meia-Noite</div>
+          <div class="dropdown-item" onclick="applyTheme('forest');closeAllMenus()">Floresta</div>
+          <div class="dropdown-item" onclick="applyTheme('purple');closeAllMenus()">Roxo</div>
+          <div class="dropdown-item" onclick="applyTheme('coffee');closeAllMenus()">Café</div>
+          <div class="dropdown-item" onclick="applyTheme('metallic');closeAllMenus()">Metálico</div>
+          <div class="dropdown-item" onclick="applyTheme('ocean');closeAllMenus()">Oceano</div>
+          <div class="dropdown-item" onclick="applyTheme('sunset');closeAllMenus()">Pôr do Sol</div>
+          <div class="dropdown-item" onclick="applyTheme('mint');closeAllMenus()">Menta</div>
+          <div class="dropdown-item" onclick="applyTheme('rose');closeAllMenus()">Rosa</div>
+          <div class="dropdown-item" onclick="applyTheme('pride');closeAllMenus()">Pride</div>
+        </div>
+      </div>
+      <div class="separator"></div>
+      <div class="dropdown-item lang-submenu">
+        <span data-i18n="language">Idioma</span>
+        <div class="lang-dropdown" id="languageDropdown">
+          <div class="dropdown-item" onclick="setLanguage('en');closeAllMenus()">Inglês</div>
+          <div class="dropdown-item" onclick="setLanguage('pt');closeAllMenus()">Português</div>
+          <div class="dropdown-item" onclick="setLanguage('es');closeAllMenus()">Espanhol</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-wrapper">
+    <div class="menu-item" onclick="toggleMenu('dropdown-help')"><span data-i18n="menuHelp">Ajuda</span></div>
+    <div class="dropdown" id="dropdown-help">
+      <div class="dropdown-item" onclick="showAbout();closeAllMenus()"><span data-i18n="about">Sobre</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TOOLBAR ==================== -->
+<div class="toolbar" id="mainToolbar">
+  <button class="tool-btn" id="playBtn" onclick="playPause()" data-tooltip-key="play" data-tooltip="play">
+    <svg class="icon"><use href="#i-play"/></svg>
+  </button>
+  <button class="tool-btn" id="stopBtn" onclick="stopPlayback()" data-tooltip-key="stop" data-tooltip="stop">
+    <svg class="icon"><use href="#i-stop"/></svg>
+  </button>
+  <button class="tool-btn" id="recordBtn" onclick="toggleRecord()" data-tooltip-key="record" data-tooltip="record">
+    <svg class="icon"><use href="#i-record"/></svg>
+  </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="importAudio()" data-tooltip-key="importAudio" data-tooltip="importAudio">
+    <svg class="icon"><use href="#i-import"/></svg>
+  </button>
+  <button class="tool-btn" onclick="exportAudio()" data-tooltip-key="exportAudio" data-tooltip="exportAudio">
+    <svg class="icon"><use href="#i-export"/></svg>
+  </button>
+  <button class="tool-btn" onclick="saveProject()" data-tooltip-key="save" data-tooltip="save">
+    <svg class="icon"><use href="#i-save"/></svg>
+  </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="addTrack()" data-tooltip-key="addTrack" data-tooltip="addTrack">
+    <svg class="icon"><use href="#i-add"/></svg>
+  </button>
+  <button class="tool-btn" onclick="deleteSelectedTrack()" data-tooltip-key="deleteTrack" data-tooltip="deleteTrack">
+    <svg class="icon"><use href="#i-delete"/></svg>
+  </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="cutSelection()" data-tooltip-key="cut" data-tooltip="cut">
+    <svg class="icon"><use href="#i-cut"/></svg>
+  </button>
+  <button class="tool-btn" onclick="copySelection()" data-tooltip-key="copy" data-tooltip="copy">
+    <svg class="icon"><use href="#i-copy"/></svg>
+  </button>
+  <button class="tool-btn" onclick="pasteClipboard()" data-tooltip-key="paste" data-tooltip="paste">
+    <svg class="icon"><use href="#i-paste"/></svg>
+  </button>
+  <button class="tool-btn" onclick="deleteSelection()" data-tooltip-key="delete" data-tooltip="delete">
+    <svg class="icon"><use href="#i-delete"/></svg>
+  </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="undoAction()" data-tooltip-key="undo" data-tooltip="undo">
+    <svg class="icon"><use href="#i-undo"/></svg>
+  </button>
+  <button class="tool-btn" onclick="redoAction()" data-tooltip-key="redo" data-tooltip="redo">
+    <svg class="icon"><use href="#i-redo"/></svg>
+  </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="zoomIn()" data-tooltip-key="zoomIn" data-tooltip="zoomIn">
+    <svg class="icon"><use href="#i-zoom-in"/></svg>
+  </button>
+  <button class="tool-btn" onclick="zoomOut()" data-tooltip-key="zoomOut" data-tooltip="zoomOut">
+    <svg class="icon"><use href="#i-zoom-out"/></svg>
+  </button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="toggleLoop()" id="loopBtn" data-tooltip-key="loop" data-tooltip="loop">
+    <svg class="icon"><use href="#i-loop"/></svg>
+  </button>
+  <button class="tool-btn" onclick="voicebox()" data-tooltip-key="voicebox" data-tooltip="voicebox">
+    <svg class="icon"><use href="#i-voice"/></svg>
+  </button>
+  <button class="tool-btn" onclick="showFiltersPanel()" data-tooltip-key="filters" data-tooltip="filters">
+    <svg class="icon"><use href="#i-filter"/></svg>
+  </button>
+  <button class="tool-btn" onclick="showEffectsPanel()" data-tooltip-key="effects" data-tooltip="effects">
+    <svg class="icon"><use href="#i-effects"/></svg>
+  </button>
+  <div style="margin-left:auto;font-size:12px;color:var(--text-3);font-family:'SF Mono',monospace;">
+    <span id="timeDisplay">00:00.000</span> / <span id="durationDisplay">00:00.000</span>
+  </div>
+</div>
+
+<!-- ==================== MAIN ==================== -->
+<div class="main">
+  <div class="explorer" id="explorer">
+    <div class="explorer-header">
+      <span id="explorerTitle" data-i18n="tracks">Faixas</span>
+      <span id="trackCount">0</span>
+    </div>
+    <div class="explorer-header-bar">
+      <svg class="icon icon-sm" style="stroke:white;margin-right:6px"><use href="#i-volume"/></svg>
+      <span data-i18n="tracks">Faixas</span>
+    </div>
+    
+    <div class="explorer-actions">
+      <button onclick="addTrack()" data-i18n-title="addTrack" title="Nova faixa">
+        <svg><use href="#i-add"/></svg>
+      </button>
+      <button onclick="deleteSelectedTrack()" data-i18n-title="deleteTrack" title="Excluir faixa">
+        <svg><use href="#i-delete"/></svg>
+      </button>
+      <button onclick="recordTrack()" data-i18n-title="recordTrack" title="Gravar faixa">
+        <svg><use href="#i-record"/></svg>
+      </button>
+    </div>
+    
+    <div class="explorer-content" id="explorerContent">
+      <div id="trackList"></div>
+    </div>
+  </div>
+
+  <div class="editor-area">
+    <div class="timeline-container" id="timelineContainer">
+      <div class="timeline-ruler" id="timelineRuler">
+        <div class="playhead" id="playhead"></div>
+        <div class="selection-overlay" id="selectionOverlay"></div>
+      </div>
+      <div class="timeline-tracks" id="timelineTracks">
+        <!-- Tracks serão renderizadas aqui -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== STATUSBAR ==================== -->
+<div class="statusbar">
+  <span id="statusText" data-i18n="ready">Pronto</span>
+  <div class="status-indicators">
+    <span class="status-ind"><span data-i18n="tracks">Faixas</span> <b id="trackCountStatus">0</b></span>
+    <span class="status-ind"><span data-i18n="duration">Duração</span> <b id="durationStatus">00:00</b></span>
+    <span class="status-ind"><span data-i18n="sampleRate">Taxa</span> <b id="sampleRateStatus">44.1 kHz</b></span>
+    <span class="status-ind" id="langIndicator">🇧🇷 PT</span>
+  </div>
+</div>
+
+<!-- ==================== MODAIS ==================== -->
+
+<!-- MODAL SOBRE -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Título</h2>
+      <button class="modal-close-btn" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal()" data-i18n="close">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div class="modal-overlay" id="confirmModalOverlay" onclick="if(event.target===this)closeConfirmModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="confirmModalTitle">Confirmar</h2>
+      <button class="modal-close-btn" onclick="closeConfirmModal()">✕</button>
+    </div>
+    <div class="modal-body" id="confirmModalContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" id="confirmModalCancel" onclick="closeConfirmModal()" data-i18n="cancel">Cancelar</button>
+      <button class="btn btn-primary" id="confirmModalOk" onclick="confirmModalAction()" data-i18n="ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INPUT -->
+<div class="modal-overlay" id="inputModalOverlay" onclick="if(event.target===this)closeInputModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="inputModalTitle">Entrada</h2>
+      <button class="modal-close-btn" onclick="closeInputModal()">✕</button>
+    </div>
+    <div class="modal-body" id="inputModalContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeInputModal()" data-i18n="cancel">Cancelar</button>
+      <button class="btn btn-primary" id="inputModalOk" onclick="inputModalAction()" data-i18n="ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ALERTA -->
+<div class="modal-overlay" id="alertModalOverlay" onclick="if(event.target===this)closeAlertModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="alertModalTitle">Aviso</h2>
+      <button class="modal-close-btn" onclick="closeAlertModal()">✕</button>
+    </div>
+    <div class="modal-body" id="alertModalContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeAlertModal()" data-i18n="ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EXPORTAÇÃO -->
+<div class="modal-overlay" id="exportModalOverlay" onclick="if(event.target===this)closeExportModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="exportModalTitle">Exportando...</h2>
+      <button class="modal-close-btn" onclick="closeExportModal()">✕</button>
+    </div>
+    <div class="modal-body" id="exportModalContent">
+      <p>Preparando o arquivo...</p>
+      <div style="text-align:center;margin:20px 0;"><div class="spinner"></div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeExportModal()" data-i18n="cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL VOZ (SEM ÍCONES E COM COMBOBOX VISÍVEL) ==================== -->
+<div class="modal-overlay" id="ttsModalOverlay" onclick="if(event.target===this)closeTTSModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 data-i18n="voicebox">Síntese de Voz</h2>
+      <button class="modal-close-btn" onclick="closeTTSModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Engine Selector -->
+      <div class="modal-input-group">
+        <label for="voiceEngineSelect">Motor de Voz</label>
+        <select id="voiceEngineSelect" onchange="toggleVoiceEngine()">
+          <option value="pollinations">IA Gratuita (Pollinations) — voz natural</option>
+          <option value="browser">Navegador (Web Speech)</option>
+          <option value="elevenlabs" style="display:none">ElevenLabs (API)</option>
+          <option value="openvoice">OpenVoice (Clonagem Local)</option>
+        </select>
+      </div>
+
+      <!-- Configurações Pollinations -->
+      <div id="pollinationsConfig">
+        <div class="modal-input-group">
+          <label for="pollinationsVoiceSelect">Voz</label>
+          <select id="pollinationsVoiceSelect" onchange="savePollinationsVoice()">
+            <option value="nova">Nova (feminina, alegre)</option>
+            <option value="shimmer">Shimmer (feminina, suave)</option>
+            <option value="alloy">Alloy (neutra)</option>
+            <option value="coral">Coral (feminina, calorosa)</option>
+            <option value="echo">Echo (masculina, grave)</option>
+            <option value="onyx">Onyx (masculina, calorosa)</option>
+            <option value="fable">Fable (narrador)</option>
+          </select>
+        </div>
+        <div style="font-size:11px;color:#888;">
+          Voz de IA gratuita via Pollinations.ai, sem necessidade de chave de API.
+        </div>
+      </div>
+
+      <!-- Configurações ElevenLabs -->
+      <div id="elevenlabsConfig" style="display:none;">
+        <div class="modal-input-group">
+          <label for="elevenlabsApiKey">API Key (ElevenLabs)</label>
+          <input type="password" id="elevenlabsApiKey" placeholder="Cole sua API Key da ElevenLabs">
+          <div style="font-size:11px;color:#888;margin-top:4px;">
+            <a href="https://elevenlabs.io/app/speech-synthesis" target="_blank" style="color:#f57900;">Obter API Key gratuita</a>
+          </div>
+        </div>
+        <div class="modal-input-group">
+          <label for="elevenlabsVoiceId">ID da Voz</label>
+          <input type="text" id="elevenlabsVoiceId" placeholder="Ex: 21m00Tcm4TlvDq8ikWAM">
+        </div>
+      </div>
+
+      <!-- Configurações OpenVoice -->
+      <div id="openvoiceConfig" style="display:none;">
+        <div class="modal-input-group">
+          <label>Voz de Referência (para clonagem)</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="recordReferenceVoice()" id="recordRefBtn">Gravar Referência</button>
+            <button class="btn btn-secondary" onclick="playReferenceVoice()">Ouvir</button>
+            <button class="btn btn-secondary" onclick="stopReferenceRecording()" id="stopRefBtn" style="display:none;">Parar</button>
+          </div>
+          <div id="referenceStatus" style="margin-top:6px;font-size:12px;color:#888;">Nenhuma voz de referência gravada.</div>
+        </div>
+        <div style="font-size:11px;color:#888;">
+          OpenVoice clona o estilo da sua voz a partir de uma gravação curta.
+        </div>
+      </div>
+
+      <!-- Seletor de Voz do Navegador -->
+      <div class="modal-input-group" id="browserVoiceGroup" style="display:none;">
+        <label>Selecionar Voz</label>
+        <div class="voice-select-group">
+          <select id="voiceLanguageSelect" onchange="updateVoiceList()">
+            <option value="pt">Português</option>
+            <option value="en">Inglês</option>
+            <option value="es">Espanhol</option>
+          </select>
+          <select id="voiceGenderSelect" onchange="updateVoiceList()">
+            <option value="female">Feminino</option>
+            <option value="male">Masculino</option>
+            <option value="any">Qualquer</option>
+          </select>
+          <button class="btn btn-secondary" onclick="previewVoice()">Testar</button>
+        </div>
+
+      </div>
+
+      <!-- Texto -->
+      <div class="modal-input-group">
+        <label for="voiceTextInput">Texto</label>
+        <textarea id="voiceTextInput" rows="3" placeholder="Digite o texto para síntese de voz..."></textarea>
+      </div>
+
+      <!-- Ações - SEM ÍCONES -->
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="synthesizeVoice()">Sintetizar</button>
+        <button class="btn btn-secondary" onclick="voiceToTrack()">Adicionar à Faixa</button>
+      </div>
+      <div id="voiceStatus" class="voice-status"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeTTSModal()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== INPUTS OCULTOS ==================== -->
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleProjectOpen(event)">
+<input type="file" id="audioInput" accept=".mp3,.wav,.ogg,.flac,.m4a" style="display:none" onchange="handleAudioImport(event)">
+
+<script>
+// ==================== VARIÁVEIS GLOBAIS ====================
+let currentLang = 'pt';
+let currentTheme = 'default';
+let isLightMode = false;
+let currentFile = null;
+let projectTitle = 'Sem Título';
+
+// Áudio
+let audioContext = null;
+let tracks = [];
+let selectedTrackIndex = -1;
+let isPlaying = false;
+let isRecording = false;
+let isLooping = false;
+let playheadPosition = 0;
+let selectionStart = 0;
+let selectionEnd = 0;
+let clipboardTrackData = null;
+let undoStack = [];
+let redoStack = [];
+let maxUndo = 20;
+let recordingData = null;
+let mediaRecorder = null;
+let recordedChunks = [];
+let playbackStartTime = 0;
+let playbackOffset = 0;
+let audioSources = [];
+let masterGain = null;
+
+// Timeline
+let zoomLevel = 1;
+let pixelsPerSecond = 50;
+let trackHeight = 80;
+
+// TTS + Clonagem
+let referenceVoiceData = null;
+let referenceAudioBuffer = null;
+let isRecordingReference = false;
+let mediaRecorderRef = null;
+let recordedReferenceChunks = [];
+let isGuidedRecording = false;
+let guidedRecorder = null;
+let guidedChunks = [];
+let selectedVoiceURI = null;
+let availableVoices = [];
+let voiceEngine = 'pollinations';
+let pollinationsVoice = localStorage.getItem('drimahsound_pollinations_voice') || 'nova';
+let elevenlabsApiKey = '';
+let elevenlabsVoiceId = '';
+
+// Elementos DOM
+const timelineTracks = document.getElementById('timelineTracks');
+const trackList = document.getElementById('trackList');
+const playhead = document.getElementById('playhead');
+const selectionOverlay = document.getElementById('selectionOverlay');
+const timeDisplay = document.getElementById('timeDisplay');
+const durationDisplay = document.getElementById('durationDisplay');
+const trackCountStatus = document.getElementById('trackCountStatus');
+
+// ==================== i18n ====================
+const translations = {
+  en: {
+    menuFile: 'File', menuEdit: 'Edit', menuView: 'View', menuInsert: 'Insert',
+    menuSettings: 'Settings', menuHelp: 'Help',
+    new: 'New Project', open: 'Open...', save: 'Save', saveAs: 'Save As...',
+    importAudio: 'Import Audio', exportAudio: 'Export Audio', exit: 'Exit',
+    undo: 'Undo', redo: 'Redo', cut: 'Cut', copy: 'Copy', paste: 'Paste',
+    delete: 'Delete', toggleExplorer: 'Toggle Explorer', toggleTheme: 'Toggle Theme',
+    zoomIn: 'Zoom In', zoomOut: 'Zoom Out', addTrack: 'Add Track',
+    recordTrack: 'Record Track', voicebox: 'Voice', filters: 'Filters', effects: 'Effects', filterPresets: 'Filter presets', effectPresets: 'Effect presets', none: 'None', filterVoice: 'Voice clarity', filterBass: 'Bass boost', filterTelephone: 'Telephone', effectStudio: 'Studio', effectWarm: 'Warm', effectEcho: 'Echo', effectReverb: 'Reverb', filterHelp: 'Choose a preset for the selected track.', effectHelp: 'Choose an effect preset for the selected track.', selectTrack: 'Select a track first.', tracks: 'Tracks',
+    duration: 'Duration', sampleRate: 'Sample Rate', ready: 'Ready',
+    close: 'Close', cancel: 'Cancel', ok: 'OK', about: 'About',
+    language: 'Language', themes: 'Themes',
+    aboutText: 'Drimah Sound is a professional multi-track audio editor built for the web.',
+    developedBy: 'Developed by',
+    play: 'Play', pause: 'Pause', stop: 'Stop', record: 'Record',
+    deleteTrack: 'Delete Track', loop: 'Loop', speed: 'Speed',
+    textToSpeak: 'Text to speak', speak: 'Speak', addToTrack: 'Add to Track',
+    untitled: 'Untitled', newProject: 'New Project',
+    confirmDelete: 'Delete this track?', enterName: 'Enter track name:',
+    track: 'Track', invalidFile: 'Invalid file',
+    exportFormat: 'Export Format', selectFormat: 'Select format:',
+    mp3Quality: 'MP3 Quality', quality: 'Quality',
+    high: 'High', medium: 'Medium', low: 'Low',
+    projectSaved: 'Project saved', projectOpened: 'Project opened',
+    audioImported: 'Audio imported', audioExported: 'Audio exported',
+    noTracks: 'No tracks to export', noAudio: 'No audio to play',
+    recordingStarted: 'Recording started', recordingStopped: 'Recording stopped',
+    trackAdded: 'Track added', trackDeleted: 'Track deleted',
+    trackRenamed: 'Track renamed',
+    speechSynthesis: 'Speech synthesis not supported',
+    maxUndo: 'Maximum undo reached',
+    info: 'Info',
+    voiceSelected: 'Selected voice:',
+    female: 'Female', male: 'Male', any: 'Any'
+  },
+  pt: {
+    menuFile: 'Arquivo', menuEdit: 'Editar', menuView: 'Exibir', menuInsert: 'Inserir',
+    menuSettings: 'Configurações', menuHelp: 'Ajuda',
+    new: 'Novo Projeto', open: 'Abrir...', save: 'Salvar', saveAs: 'Salvar Como...',
+    importAudio: 'Importar Áudio', exportAudio: 'Exportar Áudio', exit: 'Sair',
+    undo: 'Desfazer', redo: 'Refazer', cut: 'Cortar', copy: 'Copiar', paste: 'Colar',
+    delete: 'Deletar', toggleExplorer: 'Alternar Explorador', toggleTheme: 'Alternar Tema',
+    zoomIn: 'Aumentar Zoom', zoomOut: 'Diminuir Zoom', addTrack: 'Adicionar Faixa',
+    recordTrack: 'Gravar Faixa', voicebox: 'Voz', filters: 'Filtros', effects: 'Efeitos', filterPresets: 'Presets de filtro', effectPresets: 'Presets de efeitos', none: 'Nenhum', filterVoice: 'Voz clara', filterBass: 'Reforço de graves', filterTelephone: 'Telefone', effectStudio: 'Estúdio', effectWarm: 'Quente', effectEcho: 'Eco', effectReverb: 'Reverberação', filterHelp: 'Escolha um preset para a faixa selecionada.', effectHelp: 'Escolha um preset de efeito para a faixa selecionada.', selectTrack: 'Selecione uma faixa primeiro.', tracks: 'Faixas',
+    duration: 'Duração', sampleRate: 'Taxa de Amostragem', ready: 'Pronto',
+    close: 'Fechar', cancel: 'Cancelar', ok: 'OK', about: 'Sobre',
+    language: 'Idioma', themes: 'Temas',
+    aboutText: 'Drimah Sound é um editor de áudio multi-track profissional feito para a web.',
+    developedBy: 'Desenvolvido por',
+    play: 'Tocar', pause: 'Pausar', stop: 'Parar', record: 'Gravar',
+    deleteTrack: 'Excluir Faixa', loop: 'Loop', speed: 'Velocidade',
+    textToSpeak: 'Texto para falar', speak: 'Falar', addToTrack: 'Adicionar à Faixa',
+    untitled: 'Sem Título', newProject: 'Novo Projeto',
+    confirmDelete: 'Excluir esta faixa?', enterName: 'Digite o nome da faixa:',
+    track: 'Faixa', invalidFile: 'Arquivo inválido',
+    exportFormat: 'Formato de Exportação', selectFormat: 'Selecione o formato:',
+    mp3Quality: 'Qualidade MP3', quality: 'Qualidade',
+    high: 'Alta', medium: 'Média', low: 'Baixa',
+    projectSaved: 'Projeto salvo', projectOpened: 'Projeto aberto',
+    audioImported: 'Áudio importado', audioExported: 'Áudio exportado',
+    noTracks: 'Nenhuma faixa para exportar', noAudio: 'Sem áudio para tocar',
+    recordingStarted: 'Gravação iniciada', recordingStopped: 'Gravação parada',
+    trackAdded: 'Faixa adicionada', trackDeleted: 'Faixa excluída',
+    trackRenamed: 'Faixa renomeada',
+    speechSynthesis: 'Síntese de fala não suportada',
+    maxUndo: 'Máximo de desfazer atingido',
+    info: 'Informação',
+    voiceSelected: 'Voz selecionada:',
+    female: 'Feminino', male: 'Masculino', any: 'Qualquer'
+  },
+  es: {
+    menuFile: 'Archivo', menuEdit: 'Editar', menuView: 'Ver', menuInsert: 'Insertar',
+    menuSettings: 'Configuración', menuHelp: 'Ayuda',
+    new: 'Nuevo Proyecto', open: 'Abrir...', save: 'Guardar', saveAs: 'Guardar Como...',
+    importAudio: 'Importar Audio', exportAudio: 'Exportar Audio', exit: 'Salir',
+    undo: 'Deshacer', redo: 'Rehacer', cut: 'Cortar', copy: 'Copiar', paste: 'Pegar',
+    delete: 'Eliminar', toggleExplorer: 'Alternar Explorador', toggleTheme: 'Alternar Tema',
+    zoomIn: 'Aumentar Zoom', zoomOut: 'Disminuir Zoom', addTrack: 'Agregar Pista',
+    recordTrack: 'Grabar Pista', voicebox: 'Voz', filters: 'Filtros', effects: 'Efectos', filterPresets: 'Preajustes de filtro', effectPresets: 'Preajustes de efectos', none: 'Ninguno', filterVoice: 'Voz clara', filterBass: 'Refuerzo de graves', filterTelephone: 'Teléfono', effectStudio: 'Estudio', effectWarm: 'Cálido', effectEcho: 'Eco', effectReverb: 'Reverberación', filterHelp: 'Elija un preajuste para la pista seleccionada.', effectHelp: 'Elija un preajuste de efecto para la pista seleccionada.', selectTrack: 'Seleccione una pista primero.', tracks: 'Pistas',
+    duration: 'Duración', sampleRate: 'Tasa de Muestreo', ready: 'Listo',
+    close: 'Cerrar', cancel: 'Cancelar', ok: 'OK', about: 'Acerca de',
+    language: 'Idioma', themes: 'Temas',
+    aboutText: 'Drimah Sound es un editor de audio multi-track profesional para la web.',
+    developedBy: 'Desarrollado por',
+    play: 'Reproducir', pause: 'Pausar', stop: 'Detener', record: 'Grabar',
+    deleteTrack: 'Eliminar Pista', loop: 'Bucle', speed: 'Velocidad',
+    textToSpeak: 'Texto para hablar', speak: 'Hablar', addToTrack: 'Agregar a Pista',
+    untitled: 'Sin Título', newProject: 'Nuevo Proyecto',
+    confirmDelete: '¿Eliminar esta pista?', enterName: 'Ingrese el nombre de la pista:',
+    track: 'Pista', invalidFile: 'Archivo inválido',
+    exportFormat: 'Formato de Exportación', selectFormat: 'Seleccione formato:',
+    mp3Quality: 'Calidad MP3', quality: 'Calidad',
+    high: 'Alta', medium: 'Media', low: 'Baja',
+    projectSaved: 'Proyecto guardado', projectOpened: 'Proyecto abierto',
+    audioImported: 'Audio importado', audioExported: 'Audio exportado',
+    noTracks: 'No hay pistas para exportar', noAudio: 'No hay audio para reproducir',
+    recordingStarted: 'Grabación iniciada', recordingStopped: 'Grabación detenida',
+    trackAdded: 'Pista agregada', trackDeleted: 'Pista eliminada',
+    trackRenamed: 'Pista renombrada',
+    speechSynthesis: 'Síntesis de voz no soportada',
+    maxUndo: 'Máximo de deshacer alcanzado',
+    info: 'Información',
+    voiceSelected: 'Voz seleccionada:',
+    female: 'Femenino', male: 'Masculino', any: 'Cualquier'
+  }
+};
+
+function t(key) { return translations[currentLang]?.[key] || key; }
+
+// ==================== MENU CONTROLLER ====================
+function toggleMenu(menuId) {
+  const dropdown = document.getElementById(menuId);
+  if (!dropdown) return;
+  if (dropdown.style.display === 'block') { dropdown.style.display = 'none'; return; }
+  closeAllMenus();
+  dropdown.style.display = 'block';
+}
+
+function closeAllMenus() {
+  document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none');
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.menu-wrapper')) closeAllMenus();
+});
+
+// ==================== TEMA ====================
+const themes = {
+  default: {}, dark: {}, midnight: {}, forest: {}, purple: {}, coffee: {},
+  metallic: {}, ocean: {}, sunset: {}, mint: {}, rose: {}, pride: {}
+};
+
+function applyTheme(themeName) {
+  currentTheme = themeName;
+  document.body.setAttribute('data-theme', themeName);
+  if (themeName === 'default') {
+    document.body.removeAttribute('data-theme');
+    document.body.classList.remove('light-mode');
+    isLightMode = false;
+  } else if (themeName === 'pride') {
+    document.body.classList.add('light-mode');
+    isLightMode = true;
+  }
+  localStorage.setItem('drimahsound_theme', themeName);
+  saveState();
+}
+
+function loadSavedTheme() {
+  const saved = localStorage.getItem('drimahsound_theme');
+  if (saved && themes[saved]) applyTheme(saved);
+}
+
+function toggleTheme() {
+  if (currentTheme === 'default') applyTheme('dark');
+  else if (currentTheme === 'dark') applyTheme('midnight');
+  else if (currentTheme === 'midnight') applyTheme('forest');
+  else if (currentTheme === 'forest') applyTheme('purple');
+  else if (currentTheme === 'purple') applyTheme('coffee');
+  else if (currentTheme === 'coffee') applyTheme('metallic');
+  else if (currentTheme === 'metallic') applyTheme('ocean');
+  else if (currentTheme === 'ocean') applyTheme('sunset');
+  else if (currentTheme === 'sunset') applyTheme('mint');
+  else if (currentTheme === 'mint') applyTheme('rose');
+  else if (currentTheme === 'rose') applyTheme('pride');
+  else applyTheme('default');
+}
+
+// ==================== IDIOMA ====================
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('drimahsound_language', lang);
+  const langMap = { en: '🇺🇸 EN', pt: '🇧🇷 PT', es: '🇪🇸 ES' };
+  document.getElementById('langIndicator').textContent = langMap[lang] || '🇧🇷 PT';
+  document.getElementById('statusText').textContent = t('ready');
+  
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (translations[lang]?.[key]) el.textContent = translations[lang][key];
+  });
+  
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    if (translations[lang]?.[key]) el.title = translations[lang][key];
+  });
+  
+  document.getElementById('explorerTitle').textContent = t('tracks');
+  updateTrackList();
+  updateTooltips();
+  saveState();
+  updateVoiceList();
+}
+
+function loadSavedLanguage() {
+  const saved = localStorage.getItem('drimahsound_language');
+  if (saved && translations[saved]) return saved;
+  return 'pt';
+}
+
+// ==================== TOOLTIPS ====================
+const tooltipsMap = {
+  en: {
+    play: 'Play', pause: 'Pause', stop: 'Stop', record: 'Record',
+    importAudio: 'Import Audio', exportAudio: 'Export Audio',
+    save: 'Save', addTrack: 'Add Track', deleteTrack: 'Delete Track',
+    cut: 'Cut', copy: 'Copy', paste: 'Paste', delete: 'Delete',
+    undo: 'Undo', redo: 'Redo', zoomIn: 'Zoom In', zoomOut: 'Zoom Out',
+    loop: 'Loop', voicebox: 'Voice', filters: 'Filters', effects: 'Effects', mute: 'Mute', solo: 'Solo'
+  },
+  pt: {
+    play: 'Tocar', pause: 'Pausar', stop: 'Parar', record: 'Gravar',
+    importAudio: 'Importar Áudio', exportAudio: 'Exportar Áudio',
+    save: 'Salvar', addTrack: 'Adicionar Faixa', deleteTrack: 'Excluir Faixa',
+    cut: 'Cortar', copy: 'Copiar', paste: 'Colar', delete: 'Deletar',
+    undo: 'Desfazer', redo: 'Refazer', zoomIn: 'Aumentar Zoom', zoomOut: 'Diminuir Zoom',
+    loop: 'Loop', voicebox: 'Voz', filters: 'Filtros', effects: 'Efeitos', mute: 'Silenciar', solo: 'Isolar'
+  },
+  es: {
+    play: 'Reproducir', pause: 'Pausar', stop: 'Detener', record: 'Grabar',
+    importAudio: 'Importar Audio', exportAudio: 'Exportar Audio',
+    save: 'Guardar', addTrack: 'Agregar Pista', deleteTrack: 'Eliminar Pista',
+    cut: 'Cortar', copy: 'Copiar', paste: 'Pegar', delete: 'Eliminar',
+    undo: 'Deshacer', redo: 'Rehacer', zoomIn: 'Aumentar Zoom', zoomOut: 'Disminuir Zoom',
+    loop: 'Bucle', voicebox: 'Voz', filters: 'Filtros', effects: 'Efectos', mute: 'Silenciar', solo: 'Aislar'
+  }
+};
+
+function updateTooltips() {
+  const map = tooltipsMap[currentLang] || tooltipsMap.pt;
+  document.querySelectorAll('.tool-btn[data-tooltip-key]').forEach(btn => {
+    const key = btn.getAttribute('data-tooltip-key');
+    const text = map[key] || key;
+    btn.setAttribute('data-tooltip', text);
+    btn.setAttribute('aria-label', text);
+  });
+}
+
+// ==================== VOZES (TTS) ====================
+function getVoices() {
+  return new Promise((resolve) => {
+    if (window.speechSynthesis.getVoices().length > 0) {
+      resolve(window.speechSynthesis.getVoices());
+    } else {
+      window.speechSynthesis.onvoiceschanged = function() {
+        resolve(window.speechSynthesis.getVoices());
+      };
+      setTimeout(() => resolve(window.speechSynthesis.getVoices() || []), 1000);
+    }
+  });
+}
+
+function filterVoices(voices, lang, gender) {
+  let filtered = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith(lang));
+  if (!filtered.length) filtered = voices;
+
+  const femaleHints = /female|feminina|woman|girl|maria|luciana|fernanda|victoria|zira|samantha|susan|hazel|google.*female|pt-br/i;
+  const maleHints = /male|masculino|man|david|daniel|mark|alex|george|google.*male/i;
+
+  if (gender === 'female') {
+    const f = filtered.filter(v => femaleHints.test(v.name));
+    if (f.length) filtered = f;
+  }
+  if (gender === 'male') {
+    const m = filtered.filter(v => maleHints.test(v.name));
+    if (m.length) filtered = m;
+  }
+
+  return filtered;
+}
+
+async function updateVoiceList() {
+  const voices = await getVoices();
+  const lang = document.getElementById('voiceLanguageSelect')?.value || 'pt';
+  const gender = document.getElementById('voiceGenderSelect')?.value || 'any';
+  
+  const filtered = filterVoices(voices, lang, gender);
+  availableVoices = filtered;
+  
+  if (filtered.length > 0) {
+    selectedVoiceURI = filtered[0].voiceURI;
+  } else {
+    selectedVoiceURI = null;
+  }
+}
+
+function getSelectedVoice() {
+  if (selectedVoiceURI) {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.voiceURI === selectedVoiceURI) || null;
+  }
+  return null;
+}
+
+async function previewVoice() {
+  await updateVoiceList();
+  const voice = getSelectedVoice();
+  if (!voice) {
+    showAlert(t('warning'), 'Nenhuma voz disponível para teste.');
+    return;
+  }
+  
+  const testText = currentLang === 'pt' ? 'Olá, este é um teste de voz.' :
+                   currentLang === 'es' ? 'Hola, esta es una prueba de voz.' :
+                   'Hello, this is a voice test.';
+  
+  const utterance = new SpeechSynthesisUtterance(testText);
+  utterance.voice = voice;
+  utterance.lang = voice.lang;
+  utterance.rate = 0.9;
+  utterance.pitch = 1.0;
+  window.speechSynthesis.speak(utterance);
+}
+
+// ==================== MOTOR DE VOZ ====================
+function toggleVoiceEngine() {
+  const engine = document.getElementById('voiceEngineSelect').value;
+  voiceEngine = engine;
+  
+  document.getElementById('pollinationsConfig').style.display = engine === 'pollinations' ? 'block' : 'none';
+  document.getElementById('elevenlabsConfig').style.display = engine === 'elevenlabs' ? 'block' : 'none';
+  document.getElementById('openvoiceConfig').style.display = engine === 'openvoice' ? 'block' : 'none';
+  document.getElementById('browserVoiceGroup').style.display = engine === 'browser' ? 'block' : 'none';
+  
+  if (engine === 'elevenlabs') {
+    document.getElementById('elevenlabsApiKey').value = elevenlabsApiKey;
+    document.getElementById('elevenlabsVoiceId').value = elevenlabsVoiceId;
+  }
+  if (engine === 'pollinations') {
+    document.getElementById('pollinationsVoiceSelect').value = pollinationsVoice;
+  }
+}
+
+function savePollinationsVoice() {
+  pollinationsVoice = document.getElementById('pollinationsVoiceSelect').value;
+  localStorage.setItem('drimahsound_pollinations_voice', pollinationsVoice);
+}
+
+async function synthesizeVoice() {
+  const text = document.getElementById('voiceTextInput').value.trim();
+  if (!text) {
+    showAlert(t('warning'), 'Digite um texto para sintetizar.');
+    return;
+  }
+  
+  const status = document.getElementById('voiceStatus');
+  status.textContent = 'Processando...';
+  status.style.color = '#888';
+  
+  try {
+    if (voiceEngine === 'pollinations') {
+      await synthesizePollinations(text);
+    } else if (voiceEngine === 'browser') {
+      await synthesizeBrowser(text);
+    } else if (voiceEngine === 'elevenlabs') {
+      await synthesizeElevenLabs(text);
+    } else if (voiceEngine === 'openvoice') {
+      await synthesizeOpenVoice(text);
+    }
+  } catch (err) {
+    status.textContent = 'Erro: ' + err.message;
+    status.style.color = '#ff4444';
+    console.error(err);
+  }
+}
+
+async function synthesizeBrowser(text) {
+  const voice = getSelectedVoice();
+  if (!voice) {
+    throw new Error('Nenhuma voz selecionada.');
+  }
+  
+  return new Promise((resolve, reject) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+    utterance.rate = 0.9;
+    utterance.pitch = 1.0;
+    utterance.onend = () => {
+      document.getElementById('voiceStatus').textContent = 'Síntese concluída.';
+      document.getElementById('voiceStatus').style.color = '#44bb44';
+      resolve();
+    };
+    utterance.onerror = (e) => {
+      reject(new Error('Erro na síntese: ' + e.error));
+    };
+    window.speechSynthesis.speak(utterance);
+  });
+}
+
+async function synthesizePollinations(text) {
+  const status = document.getElementById('voiceStatus');
+  status.textContent = 'Gerando voz com IA (Pollinations)...';
+  status.style.color = '#888';
+
+  try {
+    initAudio();
+    const url = `https://text.pollinations.ai/${encodeURIComponent(text)}?model=openai-audio&voice=${encodeURIComponent(pollinationsVoice)}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error('Pollinations: falha ao gerar áudio (' + response.status + ')');
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    const track = addTrack('Voz IA: ' + text.substring(0, 30) + (text.length > 30 ? '...' : ''));
+    track.buffer = audioBuffer;
+    track.duration = audioBuffer.duration;
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    saveState();
+
+    status.textContent = 'Áudio gerado e adicionado como faixa!';
+    status.style.color = '#44bb44';
+
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioContext.destination);
+    source.start();
+
+  } catch (err) {
+    status.textContent = 'Erro: ' + err.message;
+    status.style.color = '#ff4444';
+    throw err;
+  }
+}
+
+async function synthesizeElevenLabs(text) {
+  const apiKey = document.getElementById('elevenlabsApiKey').value.trim();
+  const voiceId = document.getElementById('elevenlabsVoiceId').value.trim() || '21m00Tcm4TlvDq8ikWAM';
+  
+  if (!apiKey) {
+    throw new Error('API Key da ElevenLabs é obrigatória.');
+  }
+  
+  elevenlabsApiKey = apiKey;
+  elevenlabsVoiceId = voiceId;
+  localStorage.setItem('drimahsound_elevenlabs_key', apiKey);
+  localStorage.setItem('drimahsound_elevenlabs_voice', voiceId);
+  
+  const status = document.getElementById('voiceStatus');
+  status.textContent = 'Gerando áudio na ElevenLabs...';
+  
+  try {
+    const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'xi-api-key': apiKey
+      },
+      body: JSON.stringify({
+        text: text,
+        model_id: 'eleven_monolingual_v1',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error('ElevenLabs: ' + (errorData.detail || errorData.message || 'Erro na API'));
+    }
+    
+    const audioData = await response.arrayBuffer();
+    const audioBlob = new Blob([audioData], { type: 'audio/mpeg' });
+    const arrayBuffer = await audioBlob.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    
+    const track = addTrack('ElevenLabs: ' + text.substring(0, 30) + '...');
+    track.buffer = audioBuffer;
+    track.duration = audioBuffer.duration;
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    saveState();
+    
+    status.textContent = 'Áudio da ElevenLabs adicionado como faixa!';
+    status.style.color = '#44bb44';
+    
+    const source = audioContext.createBufferSource();
+    source.buffer = audioBuffer;
+    source.connect(audioContext.destination);
+    source.start();
+    
+  } catch (err) {
+    status.textContent = 'Erro: ' + err.message;
+    status.style.color = '#ff4444';
+    throw err;
+  }
+}
+
+async function synthesizeOpenVoice(text) {
+  const status = document.getElementById('voiceStatus');
+  
+  if (!referenceAudioBuffer) {
+    status.textContent = 'Grave uma voz de referência primeiro.';
+    status.style.color = '#ff4444';
+    return;
+  }
+  
+  status.textContent = 'Modo IA Natural preparado. Usando voz neural configurada...';
+  
+  try {
+    const source = audioContext.createBufferSource();
+    source.buffer = referenceAudioBuffer;
+    const gain = audioContext.createGain();
+    gain.gain.value = 0.1;
+    source.connect(gain);
+    gain.connect(audioContext.destination);
+    source.start();
+    
+    const voice = getSelectedVoice();
+    const utterance = new SpeechSynthesisUtterance(text);
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    }
+    utterance.rate = 0.85;
+    utterance.pitch = 0.95;
+    window.speechSynthesis.speak(utterance);
+    
+    status.textContent = 'Voz IA Natural reproduzida!';
+    status.style.color = '#44bb44';
+    
+  } catch (err) {
+    status.textContent = 'Erro: ' + err.message;
+    status.style.color = '#ff4444';
+    throw err;
+  }
+}
+
+// ==================== REFERÊNCIA PARA CLONAGEM ====================
+async function recordReferenceVoice() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    isRecordingReference = true;
+    recordedReferenceChunks = [];
+    
+    document.getElementById('referenceStatus').textContent = 'Gravando... Fale o texto de referência.';
+    document.getElementById('referenceStatus').style.color = '#ff4444';
+    document.getElementById('recordRefBtn').style.display = 'none';
+    document.getElementById('stopRefBtn').style.display = 'inline-flex';
+    
+    mediaRecorderRef = new MediaRecorder(stream);
+    mediaRecorderRef.ondataavailable = function(e) {
+      if (e.data.size > 0) recordedReferenceChunks.push(e.data);
+    };
+    mediaRecorderRef.onstop = function() {
+      processReferenceRecording();
+      stream.getTracks().forEach(track => track.stop());
+    };
+    mediaRecorderRef.start();
+    
+    setTimeout(() => {
+      if (isRecordingReference && mediaRecorderRef) {
+        mediaRecorderRef.stop();
+        isRecordingReference = false;
+        document.getElementById('recordRefBtn').style.display = 'inline-flex';
+        document.getElementById('stopRefBtn').style.display = 'none';
+      }
+    }, 15000);
+    
+  } catch (err) {
+    showAlert(t('error'), 'Erro ao acessar microfone: ' + err.message);
+    console.error(err);
+  }
+}
+
+function stopReferenceRecording() {
+  if (mediaRecorderRef && isRecordingReference) {
+    mediaRecorderRef.stop();
+    isRecordingReference = false;
+    document.getElementById('recordRefBtn').style.display = 'inline-flex';
+    document.getElementById('stopRefBtn').style.display = 'none';
+  }
+}
+
+async function processReferenceRecording() {
+  if (recordedReferenceChunks.length === 0) {
+    document.getElementById('referenceStatus').textContent = 'Nenhum áudio gravado. Tente novamente.';
+    document.getElementById('referenceStatus').style.color = '#ff4444';
+    return;
+  }
+  
+  const blob = new Blob(recordedReferenceChunks, { type: 'audio/wav' });
+  const arrayBuffer = await blob.arrayBuffer();
+  
+  try {
+    initAudio();
+    referenceAudioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    referenceVoiceData = {
+      buffer: referenceAudioBuffer,
+      duration: referenceAudioBuffer.duration,
+      sampleRate: referenceAudioBuffer.sampleRate
+    };
+    
+    document.getElementById('referenceStatus').textContent = 'Voz de referência gravada! (' + referenceAudioBuffer.duration.toFixed(1) + 's)';
+    document.getElementById('referenceStatus').style.color = '#4cd97a';
+    document.getElementById('recordRefBtn').style.display = 'inline-flex';
+    document.getElementById('stopRefBtn').style.display = 'none';
+    
+  } catch (err) {
+    document.getElementById('referenceStatus').textContent = 'Erro ao processar áudio: ' + err.message;
+    document.getElementById('referenceStatus').style.color = '#ff4444';
+    console.error(err);
+  }
+}
+
+function playReferenceVoice() {
+  if (!referenceAudioBuffer) {
+    showAlert(t('warning'), 'Grave sua voz de referência primeiro.');
+    return;
+  }
+  
+  initAudio();
+  const source = audioContext.createBufferSource();
+  source.buffer = referenceAudioBuffer;
+  source.connect(audioContext.destination);
+  source.start();
+}
+
+// ==================== AÇÕES DE VOZ ====================
+async function voiceToTrack() {
+  const text = document.getElementById('voiceTextInput').value.trim();
+  if (!text) {
+    showAlert(t('warning'), 'Digite um texto para sintetizar.');
+    return;
+  }
+  await synthesizeVoice();
+}
+
+function voicebox() {
+  document.getElementById('ttsModalOverlay').classList.add('active');
+  document.getElementById('voiceTextInput').value = '';
+  document.getElementById('voiceStatus').textContent = '';
+  document.getElementById('elevenlabsApiKey').value = elevenlabsApiKey;
+  document.getElementById('elevenlabsVoiceId').value = elevenlabsVoiceId;
+  
+  setTimeout(() => {
+    updateVoiceList();
+    toggleVoiceEngine();
+    document.getElementById('voiceTextInput').focus();
+  }, 100);
+}
+
+function closeTTSModal() {
+  document.getElementById('ttsModalOverlay').classList.remove('active');
+  if (isRecordingReference && mediaRecorderRef) {
+    mediaRecorderRef.stop();
+    isRecordingReference = false;
+  }
+}
+
+// ==================== ÁUDIO ENGINE ====================
+function initAudio() {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioContext.createGain();
+    masterGain.gain.value = 1.0;
+    masterGain.connect(audioContext.destination);
+  }
+  if (audioContext.state === 'suspended') {
+    audioContext.resume();
+  }
+  return audioContext;
+}
+
+function getTotalDuration() {
+  let maxDuration = 0;
+  for (const track of tracks) {
+    if (track.buffer && track.buffer.duration) {
+      maxDuration = Math.max(maxDuration, track.buffer.duration);
+    }
+  }
+  return maxDuration;
+}
+
+// ==================== TRACKS ====================
+class Track {
+  constructor(name) {
+    this.id = Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+    this.name = name || t('track') + ' ' + (tracks.length + 1);
+    this.buffer = null;
+    this.gain = 1.0;
+    this.muted = false;
+    this.solo = false;
+    this.startTime = 0;
+    this.duration = 0;
+    this.color = getTrackColor(tracks.length);
+    this.audioData = null;
+  }
+}
+
+function getTrackColor(index) {
+  const colors = ['#f57900', '#5b9cf5', '#4cd97a', '#b57cf5', '#ff7a5c', '#4dd9a0', '#f57ab8', '#ffd93d'];
+  return colors[index % colors.length];
+}
+
+function addTrack(name) {
+  initAudio();
+  const track = new Track(name);
+  tracks.push(track);
+  selectedTrackIndex = tracks.length - 1;
+  updateTrackList();
+  renderTimeline();
+  updateStats();
+  saveState();
+  document.getElementById('statusText').textContent = t('trackAdded');
+  return track;
+}
+
+function deleteTrack(index) {
+  if (tracks.length <= 1) {
+    showAlert(t('warning'), 'Não é possível excluir a última faixa.');
+    return;
+  }
+  showConfirm(t('delete'), t('confirmDelete'), t('ok'), t('cancel'), function(result) {
+    if (result) {
+      if (index === undefined) index = selectedTrackIndex;
+      if (index < 0 || index >= tracks.length) return;
+      tracks.splice(index, 1);
+      if (selectedTrackIndex >= tracks.length) selectedTrackIndex = tracks.length - 1;
+      if (selectedTrackIndex < 0) selectedTrackIndex = 0;
+      updateTrackList();
+      renderTimeline();
+      updateStats();
+      saveState();
+      document.getElementById('statusText').textContent = t('trackDeleted');
+    }
+  });
+}
+
+function deleteSelectedTrack() {
+  deleteTrack(selectedTrackIndex);
+}
+
+function renameTrack(index) {
+  if (index < 0 || index >= tracks.length) return;
+  showInput(t('rename'), t('enterName'), tracks[index].name, '', function(value) {
+    if (value !== null && value.trim() !== '') {
+      tracks[index].name = value.trim();
+      updateTrackList();
+      renderTimeline();
+      saveState();
+      document.getElementById('statusText').textContent = t('trackRenamed');
+    }
+  });
+}
+
+function toggleMute(index) {
+  if (index < 0 || index >= tracks.length) return;
+  tracks[index].muted = !tracks[index].muted;
+  updateTrackList();
+  renderTimeline();
+  saveState();
+}
+
+function toggleSolo(index) {
+  if (index < 0 || index >= tracks.length) return;
+  tracks[index].solo = !tracks[index].solo;
+  if (tracks[index].solo) {
+    for (let i = 0; i < tracks.length; i++) {
+      if (i !== index) tracks[i].solo = false;
+    }
+  }
+  updateTrackList();
+  renderTimeline();
+  saveState();
+}
+
+function setGain(index, value) {
+  if (index < 0 || index >= tracks.length) return;
+  tracks[index].gain = parseFloat(value) || 1.0;
+  updateTrackList();
+  saveState();
+}
+
+function getActiveTracks() {
+  const hasSolo = tracks.some(t => t.solo);
+  return tracks.filter((t, i) => {
+    if (hasSolo) return t.solo && !t.muted;
+    return !t.muted;
+  });
+}
+
+// ==================== TIMELINE RENDER ====================
+function renderTimeline() {
+  const container = timelineTracks;
+  container.innerHTML = '';
+  
+  const totalDuration = getTotalDuration() || 30;
+  const totalWidth = Math.max(totalDuration * pixelsPerSecond * zoomLevel, container.clientWidth || 800);
+  container.style.width = totalWidth + 'px';
+  
+  updateRuler(totalDuration, totalWidth);
+  
+  for (let i = 0; i < tracks.length; i++) {
+    const track = tracks[i];
+    const row = document.createElement('div');
+    row.className = 'track-row' + (i === selectedTrackIndex ? ' selected' : '');
+    row.dataset.index = i;
+    row.style.height = trackHeight + 'px';
+    row.style.width = totalWidth + 'px';
+    row.onclick = function(e) {
+      if (!e.target.closest('button') && !e.target.closest('input')) {
+        selectedTrackIndex = i;
+        updateTrackList();
+        renderTimeline();
+      }
+    };
+    
+    const label = document.createElement('div');
+    label.className = 'track-label';
+    label.textContent = track.name;
+    row.appendChild(label);
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = totalWidth;
+    canvas.height = trackHeight - 4;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    row.appendChild(canvas);
+    
+    const durationLabel = document.createElement('div');
+    durationLabel.className = 'track-duration';
+    durationLabel.textContent = track.buffer ? formatTime(track.buffer.duration) : '0:00';
+    row.appendChild(durationLabel);
+    
+    if (track.buffer) {
+      const vu = document.createElement('div');
+      vu.className = 'vu-meter';
+      vu.innerHTML = '<div class="vu-fill" style="height:0%"></div>';
+      row.appendChild(vu);
+    }
+    
+    container.appendChild(row);
+    drawWaveform(canvas, track);
+  }
+  
+  updatePlayhead();
+}
+
+function updateRuler(totalDuration, totalWidth) {
+  const ruler = document.getElementById('timelineRuler');
+  const existingMarkers = ruler.querySelectorAll('.marker');
+  existingMarkers.forEach(m => m.remove());
+  
+  const interval = totalDuration > 60 ? 10 : totalDuration > 30 ? 5 : totalDuration > 10 ? 2 : 1;
+  const step = (totalWidth / totalDuration) * interval;
+  
+  for (let t = 0; t <= totalDuration; t += interval) {
+    const marker = document.createElement('div');
+    marker.className = 'marker';
+    marker.style.left = (t / totalDuration * totalWidth) + 'px';
+    marker.textContent = formatTime(t);
+    ruler.appendChild(marker);
+  }
+  
+  durationDisplay.textContent = formatTime(totalDuration);
+}
+
+function drawWaveform(canvas, track) {
+  const ctx = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  
+  ctx.clearRect(0, 0, width, height);
+  
+  if (!track.buffer) {
+    ctx.fillStyle = 'rgba(255,255,255,0.05)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(255,255,255,0.1)';
+    ctx.font = '12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Sem áudio', width/2, height/2 + 4);
+    return;
+  }
+  
+  const data = track.buffer.getChannelData(0);
+  const totalSamples = data.length;
+  const samplesPerPixel = Math.max(1, Math.floor(totalSamples / width));
+  const amp = height / 2.5;
+  
+  ctx.strokeStyle = track.color || '#f57900';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  
+  for (let i = 0; i < width; i++) {
+    const start = Math.floor(i * samplesPerPixel);
+    const end = Math.min(start + samplesPerPixel, totalSamples);
+    let max = 0, min = 0;
+    for (let j = start; j < end; j++) {
+      const val = data[j] || 0;
+      if (val > max) max = val;
+      if (val < min) min = val;
+    }
+    const y1 = height/2 - max * amp;
+    const y2 = height/2 - min * amp;
+    if (i === 0) ctx.moveTo(i, y1);
+    ctx.lineTo(i, y1);
+    ctx.moveTo(i, y2);
+    ctx.lineTo(i, y2);
+  }
+  ctx.stroke();
+  
+  if (track.muted) {
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('MUTED', width/2, height/2 + 5);
+  }
+}
+
+function updatePlayhead() {
+  const totalDuration = getTotalDuration() || 30;
+  const totalWidth = Math.max(totalDuration * pixelsPerSecond * zoomLevel, 800);
+  const pos = (playheadPosition / totalDuration) * totalWidth;
+  playhead.style.left = pos + 'px';
+  timeDisplay.textContent = formatTime(playheadPosition);
+  
+  if (selectionStart < selectionEnd) {
+    const selStart = (selectionStart / totalDuration) * totalWidth;
+    const selEnd = (selectionEnd / totalDuration) * totalWidth;
+    selectionOverlay.style.display = 'block';
+    selectionOverlay.style.left = selStart + 'px';
+    selectionOverlay.style.width = (selEnd - selStart) + 'px';
+  } else {
+    selectionOverlay.style.display = 'none';
+  }
+}
+
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  const ms = Math.floor((seconds % 1) * 1000);
+  return String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0') + '.' + String(ms).padStart(3, '0');
+}
+
+// ==================== PLAYBACK ====================
+function playPause() {
+  if (isPlaying) {
+    pausePlayback();
+    return;
+  }
+  startPlayback();
+}
+
+function startPlayback() {
+  const activeTracks = getActiveTracks();
+  if (activeTracks.length === 0 || !activeTracks.some(t => t.buffer)) {
+    document.getElementById('statusText').textContent = t('noAudio');
+    return;
+  }
+  
+  initAudio();
+  if (audioContext.state === 'suspended') audioContext.resume();
+  
+  isPlaying = true;
+  document.getElementById('playBtn').innerHTML = '<svg class="icon"><use href="#i-pause"/></svg>';
+  document.getElementById('playBtn').dataset.tooltip = 'pause';
+  updateTooltips();
+  document.getElementById('statusText').textContent = t('play');
+  
+  stopAllSources();
+  
+  const currentTime = playheadPosition;
+  const totalDuration = getTotalDuration() || 0;
+  const startTime = audioContext.currentTime;
+  
+  for (const track of activeTracks) {
+    if (!track.buffer) continue;
+    const source = audioContext.createBufferSource();
+    source.buffer = track.buffer;
+    
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = track.gain;
+    
+    const trackGain = audioContext.createGain();
+    trackGain.gain.value = track.gain;
+    
+    source.connect(trackGain);
+    applyTrackAudioNodes(trackGain, track);
+    
+    const offset = Math.max(0, currentTime);
+    const duration = Math.max(0, track.buffer.duration - offset);
+    
+    source.start(startTime, offset, duration);
+    audioSources.push(source);
+    
+    source.onended = function() {
+      if (isPlaying) {
+        if (isLooping) {
+          playheadPosition = 0;
+          startPlayback();
+        } else {
+          stopPlayback();
+        }
+      }
+    };
+  }
+}
+
+function pausePlayback() {
+  if (!isPlaying) return;
+  isPlaying = false;
+  document.getElementById('playBtn').innerHTML = '<svg class="icon"><use href="#i-play"/></svg>';
+  document.getElementById('playBtn').dataset.tooltip = 'play';
+  updateTooltips();
+  document.getElementById('statusText').textContent = t('pause');
+  
+  if (audioContext) {
+    playheadPosition = audioContext.currentTime - playbackStartTime + playbackOffset;
+    if (playheadPosition < 0) playheadPosition = 0;
+    const totalDuration = getTotalDuration() || 0;
+    if (playheadPosition > totalDuration) playheadPosition = totalDuration;
+    updatePlayhead();
+  }
+  
+  stopAllSources();
+}
+
+function stopPlayback() {
+  isPlaying = false;
+  document.getElementById('playBtn').innerHTML = '<svg class="icon"><use href="#i-play"/></svg>';
+  document.getElementById('playBtn').dataset.tooltip = 'play';
+  updateTooltips();
+  document.getElementById('statusText').textContent = t('stop');
+  
+  stopAllSources();
+  playheadPosition = 0;
+  updatePlayhead();
+}
+
+function stopAllSources() {
+  for (const source of audioSources) {
+    try { source.stop(); } catch (e) {}
+  }
+  audioSources = [];
+}
+
+function toggleLoop() {
+  isLooping = !isLooping;
+  document.getElementById('loopBtn').classList.toggle('active', isLooping);
+  document.getElementById('statusText').textContent = isLooping ? t('loop') + ' ON' : t('loop') + ' OFF';
+}
+
+// ==================== ZOOM ====================
+function zoomIn() {
+  zoomLevel = Math.min(5, zoomLevel + 0.25);
+  renderTimeline();
+  saveState();
+}
+
+function zoomOut() {
+  zoomLevel = Math.max(0.25, zoomLevel - 0.25);
+  renderTimeline();
+  saveState();
+}
+
+// ==================== GRAVAÇÃO ====================
+function toggleRecord() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    initAudio();
+    
+    isRecording = true;
+    document.getElementById('recordBtn').classList.add('recording');
+    document.getElementById('statusText').textContent = t('recordingStarted');
+    recordedChunks = [];
+    
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data.size > 0) recordedChunks.push(e.data);
+    };
+    mediaRecorder.onstop = function() {
+      processRecording();
+    };
+    mediaRecorder.start();
+    
+  } catch (err) {
+    showAlert(t('error'), 'Erro ao acessar microfone: ' + err.message);
+    console.error(err);
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && isRecording) {
+    mediaRecorder.stop();
+    isRecording = false;
+    document.getElementById('recordBtn').classList.remove('recording');
+    document.getElementById('statusText').textContent = t('recordingStopped');
+    mediaRecorder.stream.getTracks().forEach(track => track.stop());
+  }
+}
+
+async function processRecording() {
+  if (recordedChunks.length === 0) {
+    showAlert(t('warning'), 'Nenhum áudio gravado.');
+    return;
+  }
+  
+  const blob = new Blob(recordedChunks, { type: 'audio/wav' });
+  const arrayBuffer = await blob.arrayBuffer();
+  
+  try {
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    const track = addTrack('Gravação ' + (tracks.length + 1));
+    track.buffer = audioBuffer;
+    track.duration = audioBuffer.duration;
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    saveState();
+    document.getElementById('statusText').textContent = 'Gravação salva com sucesso!';
+  } catch (err) {
+    showAlert(t('error'), 'Erro ao processar gravação: ' + err.message);
+    console.error(err);
+  }
+}
+
+function recordTrack() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+// ==================== IMPORTAÇÃO ====================
+function importAudio() {
+  document.getElementById('audioInput').click();
+}
+
+async function handleAudioImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    initAudio();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    
+    const track = addTrack(file.name.replace(/\.[^/.]+$/, ''));
+    track.buffer = audioBuffer;
+    track.duration = audioBuffer.duration;
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    saveState();
+    document.getElementById('statusText').textContent = t('audioImported') + ': ' + file.name;
+  } catch (err) {
+    showAlert(t('error'), t('invalidFile') + ': ' + err.message);
+    console.error(err);
+  }
+  event.target.value = '';
+}
+
+// ==================== EXPORTAÇÃO ====================
+function exportAudio() {
+  const activeTracks = getActiveTracks();
+  if (activeTracks.length === 0 || !activeTracks.some(t => t.buffer)) {
+    showAlert(t('warning'), t('noTracks'));
+    return;
+  }
+  showExportModal();
+}
+
+function showExportModal() {
+  const modal = document.getElementById('exportModalOverlay');
+  const content = document.getElementById('exportModalContent');
+  content.innerHTML = `
+    <div class="modal-input-group">
+      <label for="exportFormatSelect">${t('exportFormat')}</label>
+      <select id="exportFormatSelect">
+        <option value="wav">WAV (sem perdas)</option>
+        <option value="mp3">MP3</option>
+      </select>
+    </div>
+    <div class="modal-input-group" id="mp3QualityGroup">
+      <label for="mp3QualitySelect">${t('mp3Quality')}</label>
+      <select id="mp3QualitySelect">
+        <option value="192">${t('high')} (192 kbps)</option>
+        <option value="128" selected>${t('medium')} (128 kbps)</option>
+        <option value="64">${t('low')} (64 kbps)</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;margin-top:12px;">
+      <button class="btn btn-primary" onclick="doExport()">${t('exportAudio')}</button>
+      <button class="btn btn-secondary" onclick="closeExportModal()">${t('cancel')}</button>
+    </div>
+  `;
+  
+  document.getElementById('exportFormatSelect').onchange = function() {
+    const group = document.getElementById('mp3QualityGroup');
+    group.style.display = this.value === 'mp3' ? 'block' : 'none';
+  };
+  
+  modal.classList.add('active');
+}
+
+function closeExportModal() {
+  document.getElementById('exportModalOverlay').classList.remove('active');
+}
+
+async function doExport() {
+  const format = document.getElementById('exportFormatSelect').value;
+  const quality = parseInt(document.getElementById('mp3QualitySelect')?.value || 128);
+  
+  closeExportModal();
+  
+  try {
+    const mixedBuffer = await mixTracks();
+    if (!mixedBuffer) {
+      showAlert(t('warning'), t('noTracks'));
+      return;
+    }
+    
+    if (format === 'wav') {
+      exportWAV(mixedBuffer);
+    } else if (format === 'mp3') {
+      exportMP3(mixedBuffer, quality);
+    }
+  } catch (err) {
+    showAlert(t('error'), 'Erro ao exportar: ' + err.message);
+    console.error(err);
+  }
+}
+
+async function mixTracks() {
+  const activeTracks = getActiveTracks().filter(t => t.buffer);
+  if (activeTracks.length === 0) return null;
+  
+  const sampleRate = activeTracks[0].buffer.sampleRate;
+  const maxDuration = Math.max(...activeTracks.map(t => t.buffer.duration));
+  const length = Math.floor(maxDuration * sampleRate);
+  
+  const mixedData = new Float32Array(length);
+  
+  for (const track of activeTracks) {
+    const data = track.buffer.getChannelData(0);
+    const gain = track.gain;
+    for (let i = 0; i < Math.min(data.length, length); i++) {
+      mixedData[i] += data[i] * gain;
+    }
+  }
+  
+  let max = 0;
+  for (let i = 0; i < mixedData.length; i++) {
+    const abs = Math.abs(mixedData[i]);
+    if (abs > max) max = abs;
+  }
+  if (max > 0) {
+    const gain = 0.95 / max;
+    for (let i = 0; i < mixedData.length; i++) {
+      mixedData[i] *= gain;
+    }
+  }
+  
+  const audioBuffer = audioContext.createBuffer(1, mixedData.length, sampleRate);
+  audioBuffer.copyToChannel(mixedData, 0);
+  return audioBuffer;
+}
+
+function exportWAV(audioBuffer) {
+  const data = audioBuffer.getChannelData(0);
+  const sampleRate = audioBuffer.sampleRate;
+  
+  const wav = encodeWAV(data, sampleRate);
+  const blob = new Blob([wav], { type: 'audio/wav' });
+  downloadBlob(blob, 'audio.wav');
+  document.getElementById('statusText').textContent = t('audioExported') + ' (WAV)';
+}
+
+function encodeWAV(samples, sampleRate) {
+  const buffer = new ArrayBuffer(44 + samples.length * 2);
+  const view = new DataView(buffer);
+  
+  writeString(view, 0, 'RIFF');
+  view.setUint32(4, 36 + samples.length * 2, true);
+  writeString(view, 8, 'WAVE');
+  writeString(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, 1, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);
+  writeString(view, 36, 'data');
+  view.setUint32(40, samples.length * 2, true);
+  
+  let offset = 44;
+  for (let i = 0; i < samples.length; i++) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(offset, s * 0x7FFF, true);
+    offset += 2;
+  }
+  
+  return buffer;
+}
+
+function writeString(view, offset, string) {
+  for (let i = 0; i < string.length; i++) {
+    view.setUint8(offset + i, string.charCodeAt(i));
+  }
+}
+
+function exportMP3(audioBuffer, bitrate) {
+  const data = audioBuffer.getChannelData(0);
+  const sampleRate = audioBuffer.sampleRate;
+  
+  const pcm = new Int16Array(data.length);
+  for (let i = 0; i < data.length; i++) {
+    pcm[i] = Math.max(-32768, Math.min(32767, data[i] * 32767));
+  }
+  
+  const mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, bitrate);
+  const mp3Data = [];
+  const blockSize = 1152;
+  
+  for (let i = 0; i < pcm.length; i += blockSize) {
+    const chunk = pcm.subarray(i, i + blockSize);
+    const encoded = mp3encoder.encodeBuffer(chunk);
+    if (encoded.length > 0) mp3Data.push(encoded);
+  }
+  const final = mp3encoder.flush();
+  if (final.length > 0) mp3Data.push(final);
+  
+  const blob = new Blob(mp3Data, { type: 'audio/mp3' });
+  downloadBlob(blob, 'audio.mp3');
+  document.getElementById('statusText').textContent = t('audioExported') + ' (MP3)';
+}
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ==================== EDIÇÃO ====================
+function cutSelection() {
+  if (selectedTrackIndex < 0 || !tracks[selectedTrackIndex]?.buffer) return;
+  copySelection();
+  deleteSelection();
+}
+
+function copySelection() {
+  if (selectedTrackIndex < 0 || !tracks[selectedTrackIndex]?.buffer) return;
+  const track = tracks[selectedTrackIndex];
+  const data = track.buffer.getChannelData(0);
+  const sampleRate = track.buffer.sampleRate;
+  
+  const startSample = Math.floor(selectionStart * sampleRate);
+  const endSample = Math.floor(selectionEnd * sampleRate);
+  const length = endSample - startSample;
+  
+  if (length <= 0) {
+    showAlert(t('warning'), 'Selecione um trecho para copiar.');
+    return;
+  }
+  
+  clipboardTrackData = {
+    data: new Float32Array(data.slice(startSample, endSample)),
+    sampleRate: sampleRate,
+    duration: (endSample - startSample) / sampleRate,
+    startTime: selectionStart
+  };
+  
+  document.getElementById('statusText').textContent = 'Trecho copiado (' + formatTime(clipboardTrackData.duration) + ')';
+}
+
+function pasteClipboard() {
+  if (!clipboardTrackData) {
+    showAlert(t('warning'), 'Nada para colar.');
+    return;
+  }
+  if (selectedTrackIndex < 0) {
+    showAlert(t('warning'), 'Selecione uma faixa para colar.');
+    return;
+  }
+  
+  const track = tracks[selectedTrackIndex];
+  const currentData = track.buffer ? track.buffer.getChannelData(0) : null;
+  const sampleRate = track.buffer?.sampleRate || clipboardTrackData.sampleRate;
+  
+  if (!currentData) {
+    const newBuffer = audioContext.createBuffer(1, clipboardTrackData.data.length, sampleRate);
+    newBuffer.copyToChannel(clipboardTrackData.data, 0);
+    track.buffer = newBuffer;
+    track.duration = newBuffer.duration;
+    renderTimeline();
+    updateTrackList();
+    saveState();
+    document.getElementById('statusText').textContent = 'Áudio colado.';
+    return;
+  }
+  
+  const insertSample = Math.floor(playheadPosition * sampleRate);
+  const newLength = currentData.length + clipboardTrackData.data.length;
+  const newData = new Float32Array(newLength);
+  
+  newData.set(currentData.slice(0, insertSample));
+  newData.set(clipboardTrackData.data, insertSample);
+  newData.set(currentData.slice(insertSample), insertSample + clipboardTrackData.data.length);
+  
+  const newBuffer = audioContext.createBuffer(1, newData.length, sampleRate);
+  newBuffer.copyToChannel(newData, 0);
+  track.buffer = newBuffer;
+  track.duration = newBuffer.duration;
+  renderTimeline();
+  updateTrackList();
+  saveState();
+  document.getElementById('statusText').textContent = 'Áudio colado em ' + formatTime(playheadPosition);
+}
+
+function deleteSelection() {
+  if (selectedTrackIndex < 0 || !tracks[selectedTrackIndex]?.buffer) return;
+  const track = tracks[selectedTrackIndex];
+  const data = track.buffer.getChannelData(0);
+  const sampleRate = track.buffer.sampleRate;
+  
+  const startSample = Math.floor(selectionStart * sampleRate);
+  const endSample = Math.floor(selectionEnd * sampleRate);
+  
+  if (endSample <= startSample) {
+    showAlert(t('warning'), 'Selecione um trecho para deletar.');
+    return;
+  }
+  
+  const newData = new Float32Array(data.length - (endSample - startSample));
+  newData.set(data.slice(0, startSample));
+  newData.set(data.slice(endSample), startSample);
+  
+  const newBuffer = audioContext.createBuffer(1, newData.length, sampleRate);
+  newBuffer.copyToChannel(newData, 0);
+  track.buffer = newBuffer;
+  track.duration = newBuffer.duration;
+  
+  selectionEnd = selectionStart;
+  updatePlayhead();
+  renderTimeline();
+  updateTrackList();
+  saveState();
+  document.getElementById('statusText').textContent = 'Trecho deletado.';
+}
+
+// ==================== UNDO/REDO ====================
+function pushUndo() {
+  const state = JSON.stringify({
+    tracks: tracks.map(t => ({
+      name: t.name,
+      gain: t.gain,
+      muted: t.muted,
+      solo: t.solo,
+      duration: t.duration,
+      audioData: t.buffer ? 'dummy' : null
+    }))
+  });
+  undoStack.push(state);
+  if (undoStack.length > maxUndo) undoStack.shift();
+  redoStack = [];
+}
+
+function undoAction() {
+  if (undoStack.length === 0) {
+    document.getElementById('statusText').textContent = t('maxUndo');
+    return;
+  }
+  const state = undoStack.pop();
+  redoStack.push(JSON.stringify(tracks.map(t => ({
+    name: t.name,
+    gain: t.gain,
+    muted: t.muted,
+    solo: t.solo,
+    duration: t.duration,
+    audioData: t.buffer ? 'dummy' : null
+  }))));
+  restoreStateFromJSON(state);
+}
+
+function redoAction() {
+  if (redoStack.length === 0) return;
+  const state = redoStack.pop();
+  undoStack.push(JSON.stringify(tracks.map(t => ({
+    name: t.name,
+    gain: t.gain,
+    muted: t.muted,
+    solo: t.solo,
+    duration: t.duration,
+    audioData: t.buffer ? 'dummy' : null
+  }))));
+  restoreStateFromJSON(state);
+}
+
+function restoreStateFromJSON(json) {
+  try {
+    const data = JSON.parse(json);
+    for (let i = 0; i < data.length && i < tracks.length; i++) {
+      tracks[i].name = data[i].name;
+      tracks[i].gain = data[i].gain;
+      tracks[i].muted = data[i].muted;
+      tracks[i].solo = data[i].solo;
+      tracks[i].duration = data[i].duration;
+    }
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    saveState();
+  } catch (e) {
+    console.error('Erro ao restaurar:', e);
+  }
+}
+
+// ==================== PROJETO ====================
+function newProject() {
+  if (tracks.length > 0) {
+    showConfirm(t('new'), t('confirmNewFile'), t('ok'), t('cancel'), function(result) {
+      if (result) {
+        tracks = [];
+        selectedTrackIndex = -1;
+        currentFile = null;
+        projectTitle = t('untitled');
+        addTrack(t('track') + ' 1');
+        renderTimeline();
+        updateTrackList();
+        updateStats();
+        updateProjectTitle();
+        saveState();
+        document.getElementById('statusText').textContent = t('new');
+      }
+    });
+  } else {
+    addTrack(t('track') + ' 1');
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    updateProjectTitle();
+    saveState();
+  }
+}
+
+function openProject() {
+  document.getElementById('fileInput').click();
+}
+
+function handleProjectOpen(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      loadProjectData(data);
+      currentFile = file.name;
+      projectTitle = data.title || file.name.replace(/\.[^/.]+$/, '');
+      updateProjectTitle();
+      document.getElementById('statusText').textContent = t('projectOpened') + ': ' + file.name;
+    } catch (err) {
+      showAlert(t('error'), t('invalidFile') + ': ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function saveProject() {
+  if (!currentFile) return saveProjectAs();
+  const data = getProjectData();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = currentFile;
+  a.click();
+  URL.revokeObjectURL(url);
+  document.getElementById('statusText').textContent = t('projectSaved') + ': ' + currentFile;
+}
+
+function saveProjectAs() {
+  showInput(t('saveAs'), t('filename'), 'projeto.json', '', function(value) {
+    if (value !== null && value.trim() !== '') {
+      currentFile = value.trim();
+      if (!currentFile.endsWith('.json')) currentFile += '.json';
+      saveProject();
+    }
+  });
+}
+
+function getProjectData() {
+  return {
+    version: "1.0",
+    title: projectTitle,
+    language: currentLang,
+    theme: currentTheme,
+    zoom: zoomLevel,
+    tracks: tracks.map(t => ({
+      name: t.name,
+      gain: t.gain,
+      muted: t.muted,
+      solo: t.solo,
+      duration: t.duration
+    })),
+    timestamp: Date.now()
+  };
+}
+
+function loadProjectData(data) {
+  if (data.title) projectTitle = data.title;
+  if (data.language) setLanguage(data.language);
+  if (data.theme) applyTheme(data.theme);
+  if (data.zoom) zoomLevel = data.zoom;
+  
+  tracks = [];
+  if (data.tracks && data.tracks.length > 0) {
+    for (const t of data.tracks) {
+      const track = new Track(t.name);
+      track.gain = t.gain || 1.0;
+      track.muted = t.muted || false;
+      track.solo = t.solo || false;
+      track.duration = t.duration || 0;
+      tracks.push(track);
+    }
+  } else {
+    addTrack(t('track') + ' 1');
+  }
+  
+  selectedTrackIndex = 0;
+  renderTimeline();
+  updateTrackList();
+  updateStats();
+  updateProjectTitle();
+  saveState();
+}
+
+function updateProjectTitle() {
+  const display = document.getElementById('projectTitleDisplay');
+  display.textContent = projectTitle || t('untitled');
+  document.title = 'Drimah Sound — ' + (projectTitle || t('untitled'));
+}
+
+// ==================== EXPLORER ====================
+function toggleExplorer() {
+  const exp = document.getElementById('explorer');
+  exp.style.display = exp.style.display === 'none' ? 'flex' : 'none';
+}
+
+function updateTrackList() {
+  const container = document.getElementById('trackList');
+  container.innerHTML = '';
+  
+  for (let i = 0; i < tracks.length; i++) {
+    const track = tracks[i];
+    const item = document.createElement('div');
+    item.className = 'track-item' + (i === selectedTrackIndex ? ' active' : '');
+    item.innerHTML = `
+      <span class="track-number">${String(i + 1).padStart(2, '0')}</span>
+      <span class="track-name" ondblclick="renameTrack(${i})">${track.name}</span>
+      <div class="track-controls">
+        <input type="range" class="track-gain" min="0" max="2" step="0.01" value="${track.gain}" 
+               oninput="setGain(${i}, this.value)" title="Ganho">
+        <button onclick="toggleMute(${i})" title="${t('mute')}" class="${track.muted ? 'muted' : ''}">
+          <svg class="icon icon-sm"><use href="#i-mute"/></svg>
+        </button>
+        <button onclick="toggleSolo(${i})" title="${t('solo')}" class="${track.solo ? 'solo' : ''}">
+          <svg class="icon icon-sm"><use href="#i-volume"/></svg>
+        </button>
+      </div>
+    `;
+    container.appendChild(item);
+  }
+  
+  document.getElementById('trackCount').textContent = tracks.length;
+  document.getElementById('trackCountStatus').textContent = tracks.length;
+}
+
+// ==================== ESTATÍSTICAS ====================
+function updateStats() {
+  const totalDuration = getTotalDuration();
+  document.getElementById('durationStatus').textContent = formatTime(totalDuration);
+  document.getElementById('trackCountStatus').textContent = tracks.length;
+  
+  let sampleRate = '44.1 kHz';
+  for (const track of tracks) {
+    if (track.buffer) {
+      sampleRate = (track.buffer.sampleRate / 1000).toFixed(1) + ' kHz';
+      break;
+    }
+  }
+  document.getElementById('sampleRateStatus').textContent = sampleRate;
+}
+
+// ==================== FILTROS E EFEITOS ====================
+const audioPresetState = { filter: 'none', effect: 'none' };
+
+function ensureTrackAudioSettings(track) {
+  if (!track) return;
+  if (!track.audioSettings) track.audioSettings = { filter: 'none', effect: 'none' };
+  return track.audioSettings;
+}
+
+function setAudioPreset(type, preset) {
+  const track = tracks[selectedTrackIndex];
+  if (!track) { showAlert(t('warning'), t('selectTrack')); return; }
+  const settings = ensureTrackAudioSettings(track);
+  settings[type] = preset;
+  renderTimeline();
+  updateTrackList();
+  saveState();
+  const title = type === 'filter' ? t('filters') : t('effects');
+  document.getElementById('statusText').textContent = title + ': ' + presetLabel(type, preset);
+  closeModal();
+}
+
+function presetLabel(type, preset) {
+  const labels = {
+    filter: { none:t('none'), voice:t('filterVoice'), bass:t('filterBass'), telephone:t('filterTelephone') },
+    effect: { none:t('none'), studio:t('effectStudio'), warm:t('effectWarm'), echo:t('effectEcho'), reverb:t('effectReverb') }
+  };
+  return (labels[type] && labels[type][preset]) || preset;
+}
+
+function presetButton(type, key, icon, label) {
+  const active = tracks[selectedTrackIndex] && ensureTrackAudioSettings(tracks[selectedTrackIndex])[type] === key;
+  return `<button class="modal-choice-btn ${active ? 'active' : ''}" onclick="setAudioPreset('${type}','${key}')"><svg class="icon icon-sm"><use href="#${icon}"/></svg><span>${label}</span></button>`;
+}
+
+function showFiltersPanel() {
+  showModal(t('filters'), `
+    <div class="preset-panel">
+      <div class="preset-subtitle">${t('filterPresets')}</div>
+      <div class="preset-grid">
+        ${presetButton('filter','none','i-filter',t('none'))}
+        ${presetButton('filter','voice','i-voice',t('filterVoice'))}
+        ${presetButton('filter','bass','i-volume',t('filterBass'))}
+        ${presetButton('filter','telephone','i-filter',t('filterTelephone'))}
+      </div>
+      <p class="preset-help">${t('filterHelp')}</p>
+    </div>`);
+}
+
+function showEffectsPanel() {
+  showModal(t('effects'), `
+    <div class="preset-panel">
+      <div class="preset-subtitle">${t('effectPresets')}</div>
+      <div class="preset-grid">
+        ${presetButton('effect','none','i-effects',t('none'))}
+        ${presetButton('effect','studio','i-volume',t('effectStudio'))}
+        ${presetButton('effect','warm','i-voice',t('effectWarm'))}
+        ${presetButton('effect','echo','i-loop',t('effectEcho'))}
+        ${presetButton('effect','reverb','i-effects',t('effectReverb'))}
+      </div>
+      <p class="preset-help">${t('effectHelp')}</p>
+    </div>`);
+}
+
+function applyTrackAudioNodes(source, track) {
+  const settings = ensureTrackAudioSettings(track);
+  let node = source;
+  const nodes = [];
+  if (settings.filter !== 'none') {
+    const f = audioContext.createBiquadFilter();
+    if (settings.filter === 'voice') { f.type='highshelf'; f.frequency.value=2800; f.gain.value=3; }
+    if (settings.filter === 'bass') { f.type='lowshelf'; f.frequency.value=180; f.gain.value=5; }
+    if (settings.filter === 'telephone') { f.type='bandpass'; f.frequency.value=1400; f.Q.value=0.9; }
+    node.connect(f); node=f; nodes.push(f);
+  }
+  if (settings.effect === 'echo') {
+    const d=audioContext.createDelay(2); d.delayTime.value=.22;
+    const fb=audioContext.createGain(); fb.gain.value=.28;
+    node.connect(d); d.connect(fb); fb.connect(d); d.connect(masterGain); node.connect(masterGain); return nodes.concat([d,fb]);
+  }
+  if (settings.effect === 'reverb') {
+    const d=audioContext.createDelay(1.5); d.delayTime.value=.08;
+    const g=audioContext.createGain(); g.gain.value=.22;
+    node.connect(d); d.connect(g); g.connect(masterGain); node.connect(masterGain); return nodes.concat([d,g]);
+  }
+  if (settings.effect === 'warm') {
+    const f=audioContext.createBiquadFilter(); f.type='lowshelf'; f.frequency.value=320; f.gain.value=2.5;
+    node.connect(f); node=f; nodes.push(f);
+  }
+  if (settings.effect === 'studio') {
+    const c=audioContext.createDynamicsCompressor(); c.threshold.value=-18; c.knee.value=10; c.ratio.value=3; c.attack.value=.005; c.release.value=.12;
+    node.connect(c); node=c; nodes.push(c);
+  }
+  node.connect(masterGain);
+  return nodes;
+}
+
+// ==================== MODAIS DE SISTEMA ====================
+let alertCallback = null;
+function showAlert(title, message, callback) {
+  document.getElementById('alertModalTitle').textContent = title || t('warning');
+  document.getElementById('alertModalContent').innerHTML = `<p>${message}</p>`;
+  alertCallback = callback || null;
+  document.getElementById('alertModalOverlay').classList.add('active');
+}
+function closeAlertModal() {
+  document.getElementById('alertModalOverlay').classList.remove('active');
+  if (alertCallback) { const cb = alertCallback; alertCallback = null; cb(); }
+}
+
+let confirmCallback = null;
+function showConfirm(title, message, okText, cancelText, callback) {
+  document.getElementById('confirmModalTitle').textContent = title || t('confirm');
+  document.getElementById('confirmModalContent').innerHTML = `<p>${message}</p>`;
+  document.getElementById('confirmModalOk').textContent = okText || t('ok');
+  document.getElementById('confirmModalCancel').textContent = cancelText || t('cancel');
+  confirmCallback = callback || null;
+  document.getElementById('confirmModalOverlay').classList.add('active');
+}
+function closeConfirmModal() {
+  document.getElementById('confirmModalOverlay').classList.remove('active');
+  if (confirmCallback) { const cb = confirmCallback; confirmCallback = null; cb(false); }
+}
+function confirmModalAction() {
+  document.getElementById('confirmModalOverlay').classList.remove('active');
+  if (confirmCallback) { const cb = confirmCallback; confirmCallback = null; cb(true); }
+}
+
+let inputCallback = null;
+function showInput(title, message, defaultValue, placeholder, callback) {
+  document.getElementById('inputModalTitle').textContent = title || t('input');
+  document.getElementById('inputModalContent').innerHTML = `
+    <p>${message || ''}</p>
+    <input type="text" id="inputModalField" value="${defaultValue || ''}" placeholder="${placeholder || ''}">
+  `;
+  inputCallback = callback || null;
+  document.getElementById('inputModalOverlay').classList.add('active');
+  setTimeout(() => { const field = document.getElementById('inputModalField'); if (field) { field.focus(); field.select(); } }, 100);
+}
+function closeInputModal() {
+  document.getElementById('inputModalOverlay').classList.remove('active');
+  if (inputCallback) { const cb = inputCallback; inputCallback = null; cb(null); }
+}
+function inputModalAction() {
+  const field = document.getElementById('inputModalField');
+  const value = field ? field.value : '';
+  document.getElementById('inputModalOverlay').classList.remove('active');
+  if (inputCallback) { const cb = inputCallback; inputCallback = null; cb(value); }
+}
+
+function showModal(title, content) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalContent').innerHTML = content;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+
+// ==================== SOBRE ====================
+function showAbout() {
+  const logoImg = document.getElementById('headerLogo');
+  const logoSrc = logoImg ? logoImg.src : 'drimahsound.png';
+  showModal(t('about'), `
+    <div class="modal-about-logo"><img src="${logoSrc}" alt="Logo Drimah Sound"></div>
+    <div class="modal-about-title"><span class="modal-about-accent">Drimah</span> Sound</div>
+    <p style="font-size:18px;margin-top:8px;margin-bottom:12px;color:var(--text-1);text-align:center;">
+      <span style="color:var(--text-3);font-size:13px;font-weight:400">versão 1.0 de 2026</span>
+    </p>
+    <p style="text-align:center;margin-top:12px;"><b>${t('developedBy')}</b> Drimah Technology.</p>
+    <p style="text-align:center;">${t('aboutText')}</p>
+    <p style="text-align:center;margin-top:16px"><a href="https://github.com/drimah" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:var(--text-1);text-decoration:none;font-weight:500;"><svg class="icon icon-sm"><use href="#i-github"/></svg> github.com/drimah</a></p>
+  `);
+}
+
+// ==================== SAIR ====================
+function closeApp() {
+  showConfirm(t('exit'), t('exitConfirm'), t('ok'), t('cancel'), function(result) {
+    if (result) {
+      saveState();
+      window.close();
+    }
+  });
+}
+
+// ==================== ESTADO (localStorage) ====================
+function saveState() {
+  try {
+    const state = {
+      version: "1.0",
+      title: projectTitle,
+      language: currentLang,
+      theme: currentTheme,
+      zoom: zoomLevel,
+      tracks: tracks.map(t => ({
+        name: t.name,
+        gain: t.gain,
+        muted: t.muted,
+        solo: t.solo,
+        duration: t.duration,
+        audioSettings: t.audioSettings || { filter: 'none', effect: 'none' }
+      })),
+      currentFile: currentFile,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('drimahsound_state', JSON.stringify(state));
+  } catch (e) {
+    console.warn('Erro ao salvar estado:', e);
+  }
+}
+
+function restoreState() {
+  try {
+    const saved = localStorage.getItem('drimahsound_state');
+    if (!saved) return false;
+    const state = JSON.parse(saved);
+    if (state.title) projectTitle = state.title;
+    if (state.language) setLanguage(state.language);
+    if (state.theme) applyTheme(state.theme);
+    if (state.zoom) zoomLevel = state.zoom;
+    if (state.currentFile) currentFile = state.currentFile;
+    
+    if (state.tracks && state.tracks.length > 0) {
+      tracks = [];
+      for (const t of state.tracks) {
+        const track = new Track(t.name);
+        track.gain = t.gain || 1.0;
+        track.muted = t.muted || false;
+        track.solo = t.solo || false;
+        track.duration = t.duration || 0;
+        track.audioSettings = t.audioSettings || { filter: 'none', effect: 'none' };
+        tracks.push(track);
+      }
+      selectedTrackIndex = 0;
+    } else {
+      addTrack(t('track') + ' 1');
+    }
+    
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    updateProjectTitle();
+    return true;
+  } catch (e) {
+    console.warn('Erro ao restaurar estado:', e);
+    return false;
+  }
+}
+
+// ==================== INICIALIZAÇÃO ====================
+function init() {
+  const savedLang = loadSavedLanguage();
+  currentLang = savedLang;
+  setLanguage(savedLang);
+  loadSavedTheme();
+  
+  if (window.speechSynthesis) {
+    getVoices().then(() => updateVoiceList());
+  }
+  
+  const restored = restoreState();
+  if (!restored) {
+    addTrack(t('track') + ' 1');
+    renderTimeline();
+    updateTrackList();
+    updateStats();
+    updateProjectTitle();
+  }
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey || e.metaKey) {
+      switch(e.key.toLowerCase()) {
+        case 'n': e.preventDefault(); newProject(); break;
+        case 'o': e.preventDefault(); openProject(); break;
+        case 's': e.preventDefault(); saveProject(); break;
+        case 't': e.preventDefault(); addTrack(); break;
+        case 'r': e.preventDefault(); recordTrack(); break;
+        case 'v': e.preventDefault(); voicebox(); break;
+        case 'i': e.preventDefault(); importAudio(); break;
+        case 'e': e.preventDefault(); exportAudio(); break;
+        case 'z': e.preventDefault(); undoAction(); break;
+        case 'y': e.preventDefault(); redoAction(); break;
+        case 'x': e.preventDefault(); cutSelection(); break;
+        case 'c': e.preventDefault(); copySelection(); break;
+        case 'p': e.preventDefault(); pasteClipboard(); break;
+        case 'q': e.preventDefault(); closeApp(); break;
+        case '+': case '=': e.preventDefault(); zoomIn(); break;
+        case '-': e.preventDefault(); zoomOut(); break;
+      }
+    }
+    if (e.key === ' ' && !e.target.closest('input, textarea')) {
+      e.preventDefault();
+      playPause();
+    }
+    if (e.key === 'Delete' && !e.target.closest('input, textarea')) {
+      deleteSelection();
+    }
+  });
+  
+  window.addEventListener('resize', function() {
+    renderTimeline();
+  });
+  
+  setInterval(saveState, 10000);
+  window.addEventListener('beforeunload', function() {
+    saveState();
+  });
+  
+  updateTooltips();
+  document.getElementById('statusText').textContent = t('ready');
+  
+  console.log('Drimah Sound inicializado!');
+  console.log('Idioma:', currentLang);
+  console.log('Tema:', currentTheme);
+  console.log('Faixas:', tracks.length);
+  console.log('Zoom:', zoomLevel + 'x');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<!-- Drimah Voice AI Bridge: preparado para OpenVoice local sem API key. OpenVoice requer motor local/backend para geração neural real. -->
+</body>
+</html>

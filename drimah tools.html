@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Drimah Tools</title>
+<style>
+:root{
+ --bg:#101010;
+ --panel:#191919;
+ --panel2:#222;
+ --text:#ededed;
+ --muted:#999;
+ --accent:#ff6b00;
+ --border:#333;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ height:100vh;
+ background:var(--bg);
+ color:var(--text);
+ font-family:Arial, sans-serif;
+}
+.top{
+ height:58px;
+ display:flex;
+ align-items:center;
+ padding:0 22px;
+ background:var(--panel);
+ border-bottom:1px solid var(--border);
+}
+.app-icon{
+ width:30px;
+ height:30px;
+ margin-right:12px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ border:1px solid var(--border);
+ border-radius:6px;
+ color:var(--accent);
+}
+.app-name{
+ font-size:20px;
+ font-weight:bold;
+}
+.menu{
+ height:36px;
+ display:flex;
+ align-items:center;
+ gap:28px;
+ padding-left:22px;
+ background:var(--panel);
+ border-bottom:1px solid var(--border);
+ font-size:14px;
+}
+.modules{
+ height:54px;
+ display:flex;
+ align-items:center;
+ gap:10px;
+ padding-left:18px;
+ background:var(--panel2);
+ border-bottom:1px solid var(--border);
+}
+.module{
+ width:38px;
+ height:38px;
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ color:#ddd;
+ border-radius:5px;
+ cursor:pointer;
+}
+.module:hover,.module.active{
+ color:var(--accent);
+ background:#2b2b2b;
+}
+.content{
+ height:calc(100vh - 178px);
+ display:flex;
+}
+.side{
+ width:230px;
+ background:var(--panel);
+ border-right:1px solid var(--border);
+ padding:18px;
+ color:var(--muted);
+}
+.area{
+ flex:1;
+ padding:35px;
+}
+.status{
+ height:30px;
+ background:var(--panel);
+ border-top:1px solid var(--border);
+ color:var(--muted);
+ padding:7px 18px;
+ font-size:12px;
+}
+
+.module svg{
+ width:20px;
+ height:20px;
+ stroke:currentColor;
+ fill:none;
+ stroke-width:1.8;
+ stroke-linecap:round;
+ stroke-linejoin:round;
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+ <div class="app-icon">⚙</div>
+ <div class="app-name">Drimah Tools</div>
+</div>
+
+<div class="menu">
+ Arquivo
+ Editar
+ Exibir
+ Ferramentas
+ Ajuda
+</div>
+
+<div class="modules">
+ <div class="module active" title="Agenda"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></div>
+ <div class="module" title="Atividades"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M8 9l2 2 5-5M8 15h8"/></svg></div>
+ <div class="module" title="Notas"><svg viewBox="0 0 24 24"><path d="M6 3h12v18H6z"/><path d="M8 8h8M8 12h8M8 16h6"/></svg></div>
+ <div class="module" title="Contatos"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M5 20c1-4 13-4 14 0"/></svg></div>
+ <div class="module" title="Calculadora"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h2M12 12h2M16 12h0M8 16h2M12 16h2"/></svg></div>
+ <div class="module" title="Tempo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg></div>
+ <div class="module" title="Captura"><svg viewBox="0 0 24 24"><path d="M4 5h16v12H4z"/><path d="M8 20h8M12 17v3"/></svg></div>
+ <div class="module" title="Conversor"><svg viewBox="0 0 24 24"><path d="M7 7h12l-3-3M17 17H5l3 3"/></svg></div>
+ <div class="module" title="Arquivos"><svg viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M4 7l4-3h12"/></svg></div>
+ <div class="module" title="Cofre"><svg viewBox="0 0 24 24"><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg></div>
+</div>
+
+<div class="content">
+ <div class="side">
+  <b>Agenda</b><br><br>
+  Hoje<br>
+  Calendário<br>
+  Novo evento<br>
+  Lembretes
+ </div>
+ <div class="area">
+  <h1>Agenda</h1>
+  <p>Área do módulo selecionado do Drimah Tools.</p>
+ </div>
+</div>
+
+<div class="status">
+ Drimah Tools | Pronto
+</div>
+
+</body>
+</html>

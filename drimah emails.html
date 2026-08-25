@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drimah Emails — Real AutoConfig</title>
+<link rel="icon" type="image/x-icon" href="drimahemails.ico">
+<link rel="shortcut icon" href="drimahemails.ico">
+
+<style>
+:root {
+  --bg-0: #1a1a1a;
+  --bg-1: #2d2d2d;
+  --bg-2: #383838;
+  --bg-3: #444444;
+  --bg-hover: #4a4a4a;
+  --border: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.1);
+  --text-1: #ffffff;
+  --text-2: #ffffff;
+  --text-3: #ffffff;
+  --accent: #f57900;
+  --accent-dark: #cc5f00;
+  --accent-light: #ff9a44;
+  --accent-soft: rgba(245, 121, 0, 0.15);
+  --icon: #ffffff;
+  --modal-header-bg: rgba(0,0,0,0.3);
+  --modal-body-bg: rgba(255,255,255,0.04);
+  --modal-radius: 16px;
+  --modal-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  --input-radius: 10px;
+  --btn-radius: 50px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+  background: var(--bg-0);
+  color: var(--text-1);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.icon { width: 20px; height: 20px; stroke: var(--icon); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; fill: none; flex-shrink: 0; }
+.icon-sm { width: 14px; height: 14px; stroke-width: 1.6; }
+
+.header, .menubar, .toolbar { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); background: var(--bg-1); border: 1px solid var(--border); box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+.header { background: var(--bg-1); height: 56px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid var(--border); gap: 14px; position: relative; z-index: 100; }
+.brand-logo { height: 40px; width: auto; }
+.brand-name { font-family: 'Georgia', serif; font-size: 24px; font-weight: 400; color: var(--text-1); text-shadow: 0 0 30px rgba(245, 121, 0, 0.08); }
+.project-title { font-family: 'Georgia', serif; font-size: 20px; font-weight: 300; color: var(--text-2); opacity: 0.8; margin-left: auto; margin-right: 16px; }
+
+.menubar { background: var(--bg-1); height: 34px; display: flex; align-items: center; padding: 0 8px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-2); position: relative; z-index: 99; }
+.menu-wrapper { position: relative; display: inline-block; height: 100%; }
+.menu-item { padding: 6px 14px; cursor: pointer; border-radius: 6px; color: var(--text-2); transition: color 0.2s, background 0.2s; display: flex; align-items: center; height: 100%; user-select: none; }
+.menu-item:hover { background: var(--accent-soft); color: var(--text-1); }
+.menu-wrapper .dropdown { display: none; position: fixed; top: 90px; background: var(--bg-2); backdrop-filter: blur(12px); border: 1px solid var(--border-strong); border-radius: 12px; min-width: 260px; padding: 6px; z-index: 999999 !important; box-shadow: 0 8px 48px rgba(0,0,0,0.7); animation: slideDown 0.2s ease; }
+.menu-wrapper:nth-child(1) .dropdown { left: 8px; }
+.menu-wrapper:nth-child(2) .dropdown { left: 80px; }
+.menu-wrapper:nth-child(3) .dropdown { left: 148px; }
+.menu-wrapper:nth-child(4) .dropdown { left: 208px; }
+.menu-wrapper:nth-child(5) .dropdown { left: 278px; }
+.menu-wrapper:nth-child(6) .dropdown { left: 348px; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.dropdown-item { padding: 8px 14px; border-radius: 8px; display: flex; justify-content: space-between; cursor: pointer; color: var(--text-2); font-size: 13px; transition: all 0.15s; }
+.dropdown-item:hover { background: var(--accent-soft); color: var(--accent-light); }
+.dropdown-item .shortcut { color: var(--text-3); font-size: 11px; margin-left: 24px; font-family: 'SF Mono', monospace; }
+.separator { height: 1px; background: var(--border); margin: 4px 8px; }
+.lang-submenu { position: relative; }
+.lang-submenu .lang-dropdown { display: none; position: absolute; left: 100%; top: 0; background: var(--bg-2); backdrop-filter: blur(12px); border: 1px solid var(--border-strong); border-radius: 12px; min-width: 180px; padding: 6px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); z-index: 999999 !important; }
+.lang-submenu:hover > .lang-dropdown { display: block; }
+
+.toolbar { background: var(--bg-1); height: 52px; display: flex; align-items: center; padding: 0 14px; gap: 2px; border-bottom: 1px solid var(--border); position: relative; z-index: 10; flex-wrap: nowrap; overflow-x: auto; }
+.tool-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; transition: all 0.15s; border: none; background: transparent; position: relative; flex-shrink: 0; }
+.tool-btn svg, .tool-btn svg *, .tool-btn .icon, .tool-btn .icon * { stroke: #ffffff !important; fill: none !important; color: #ffffff !important; width: 20px !important; height: 20px !important; stroke-width: 1.6 !important; }
+.tool-btn:hover { background: var(--accent-soft); }
+.tool-btn:hover svg, .tool-btn:hover svg *, .tool-btn:hover .icon, .tool-btn:hover .icon * { stroke: var(--accent-light) !important; }
+.tool-btn:active { background: var(--bg-hover); transform: scale(0.95); }
+.tool-btn.active { background: var(--accent-soft); border: 1.5px solid var(--accent); border-radius: 50%; }
+.tool-btn.active svg, .tool-btn.active svg *, .tool-btn.active .icon, .tool-btn.active .icon * { stroke: var(--accent-light) !important; }
+.tool-sep { width: 1px; height: 26px; background: var(--border); margin: 0 8px; flex-shrink: 0; }
+
+#globalTooltip { position: fixed; background: var(--text-1); color: var(--bg-0); padding: 5px 10px; border-radius: 6px; font-size: 11px; white-space: nowrap; z-index: 9999999; pointer-events: none; opacity: 0; transition: opacity 0.12s ease; top: 0; left: 0; }
+#globalTooltip.visible { opacity: 1; }
+
+.main { flex: 1; display: flex; overflow: hidden; }
+.explorer { width: 280px; background: var(--bg-1); backdrop-filter: blur(8px); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: relative; z-index: 5; }
+.explorer.hidden { display: none; }
+.explorer-header { padding: 12px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.explorer-header-bar { background: var(--accent); height: 26px; display: flex; align-items: center; padding: 0 12px; font-size: 12px; font-weight: 600; color: white; letter-spacing: 0.02em; }
+.explorer-content { flex: 1; overflow-y: auto; padding: 6px 4px; }
+
+.side-it { padding: 6px 12px; border-radius: 6px; font-size: 12.5px; cursor: pointer; margin-bottom: 1px; display: flex; align-items: center; gap: 8px; color: var(--text-2); transition: all 0.15s; background: transparent; border: none; width: 100%; text-align: left; }
+.side-it:hover { background: var(--accent-soft); color: var(--text-1); }
+.side-it.on { background: var(--accent-soft); color: var(--accent-light); border-left: 3px solid var(--accent); }
+.side-it .lbl { flex: 1; }
+.side-it .side-cnt { background: var(--bg-3); padding: 1px 8px; border-radius: 12px; font-size: 11px; }
+.side-title { padding: 8px 12px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-3); display: flex; justify-content: space-between; align-items: center; }
+.side-bottom { border-top: 1px solid var(--border); padding: 6px 0; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.acc-avatar-sm { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+.icbtn { background: transparent; border: none; color: var(--text-3); cursor: pointer; border-radius: 4px; padding: 2px 4px; }
+.icbtn:hover { background: var(--accent-soft); color: var(--text-1); }
+.icbtn.danger:hover { background: rgba(255,50,50,0.2); color: #ff5555; }
+
+.list-pane { flex: 1; display: flex; flex-direction: column; background: var(--bg-1); border-right: 1px solid var(--border); overflow: hidden; }
+.list-head { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; font-weight: 500; font-size: 14px; }
+.list-head span:last-child { color: var(--text-3); font-weight: 400; font-size: 12px; }
+.list-box { flex: 1; overflow-y: auto; padding: 4px; }
+.msg { padding: 12px 14px; border-radius: 8px; cursor: pointer; margin-bottom: 2px; border-bottom: 1px solid var(--border); transition: all 0.15s; }
+.msg:hover { background: var(--bg-hover); }
+.msg.unread { background: rgba(255,255,255,0.04); font-weight: 500; }
+.msg.sel { background: var(--accent-soft); border-left: 3px solid var(--accent); }
+.msg-top { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px; }
+.msg-from { font-weight: 600; color: var(--text-1); }
+.msg-date { color: var(--text-3); font-size: 11px; }
+.msg-subj { font-weight: 500; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-snip { color: var(--text-3); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msg-icons { display: flex; gap: 6px; margin-top: 4px; align-items: center; }
+.msg-icons .star { color: #f5b342; }
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-3); gap: 8px; }
+.empty svg { width: 40px; height: 40px; stroke: var(--text-3); }
+
+.reading-pane { flex: 1.5; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-0); padding: 0; }
+.rd { display: flex; flex-direction: column; height: 100%; min-height: 0; overflow: hidden; }
+.rd-header { flex-shrink: 0; padding: 18px 20px; border-bottom: 1px solid var(--border); background: var(--bg-0); display: flex; align-items: flex-start; gap: 14px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+.rd-title-block { flex: 1; min-width: 0; }
+.rd-sender-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.rd-sender-name { font-size: 16px; font-weight: 700; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rd-subject { font-size: 14px; font-weight: 400; color: var(--text-2); margin-top: 2px; }
+.rd-email { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.rd-date { color: var(--text-3); font-size: 12px; white-space: nowrap; flex-shrink: 0; }
+.rd-scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; background: #ffffff; }
+.rd-body { line-height: 1.7; color: #1a1a1a; padding: 20px; }
+
+.statusbar { background: var(--bg-1); backdrop-filter: blur(8px); height: 26px; display: flex; align-items: center; padding: 0 14px; font-size: 11.5px; color: var(--text-3); border-top: 1px solid var(--border); justify-content: space-between; position: relative; z-index: 5; }
+.status-indicators { display: flex; gap: 18px; }
+.status-ind b { color: var(--text-2); font-weight: 500; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999; align-items: center; justify-content: center; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: fadeIn 0.25s ease; }
+.modal-overlay.active { display: flex; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalSlideUp { from { opacity: 0; transform: translateY(30px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+.modal { background: var(--bg-2); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--border-strong); border-radius: var(--modal-radius, 16px); min-width: 400px; max-width: 500px; width: 100%; box-shadow: var(--modal-shadow, 0 20px 60px rgba(0,0,0,0.6)); animation: modalSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); overflow: hidden; }
+.modal-header { background: var(--modal-header-bg, rgba(0,0,0,0.3)); padding: 20px 26px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.modal-header h2 { color: var(--text-1); font-size: 18px; font-weight: 600; margin: 0; letter-spacing: -0.3px; }
+.modal-header .modal-close-btn { width: 32px; height: 32px; border: none; background: rgba(255,255,255,0.06); border-radius: 50%; color: var(--text-3); cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.modal-header .modal-close-btn:hover { background: rgba(255,255,255,0.12); color: var(--text-1); }
+.modal-body { background: var(--modal-body-bg, rgba(255,255,255,0.04)); padding: 24px 26px 20px; }
+.modal-footer { background: var(--modal-header-bg, rgba(0,0,0,0.2)); padding: 14px 26px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; justify-content: flex-end; }
+.modal-body input, .modal-body textarea, .modal-body select { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.06); border: 1.5px solid var(--border); border-radius: var(--input-radius, 10px); color: var(--text-1); font-size: 14px; font-family: inherit; transition: all 0.2s; outline: none; }
+.modal-body input:focus, .modal-body textarea:focus, .modal-body select:focus { border-color: var(--accent); background: rgba(255,255,255,0.08); box-shadow: 0 0 0 3px var(--accent-soft); }
+.btn { padding: 10px 24px; border: none; border-radius: var(--btn-radius, 50px) !important; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.25s ease; letter-spacing: 0.3px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(245, 121, 0, 0.3); }
+.btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(245, 121, 0, 0.4); }
+.btn-secondary { background: rgba(255,255,255,0.08); color: var(--text-2); border: 1px solid var(--border); }
+.btn-secondary:hover { background: rgba(255,255,255,0.15); color: var(--text-1); transform: translateY(-1px); }
+
+.modal-about-logo { text-align: center; margin-bottom: 16px; }
+.modal-about-logo img { height: 80px; width: auto; border-radius: 12px; }
+.modal-about-title { font-family: 'Georgia', serif; font-size: 24px; font-weight: 400; color: var(--text-1); text-align: center; }
+.modal-about-accent { color: var(--accent); }
+.modal-about-version { color: var(--text-3); font-size: 13px; font-weight: 400; }
+.modal-about-link { display: inline-flex; align-items: center; gap: 6px; color: #fff; text-decoration: none; font-weight: 500; }
+.modal-about-link svg { stroke: #fff; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-0); }
+::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+body.light-mode {
+  --bg-0: #f0f0f0; --bg-1: #ffffff; --bg-2: #f8f8f8; --bg-3: #e8e8e8; --bg-hover: #e0e0e0; --border: rgba(0,0,0,0.06); --border-strong: rgba(0,0,0,0.1); --text-1: #1a1a1a; --text-2: #333333; --text-3: #888888; --accent: #f57900; --accent-dark: #cc5f00; --accent-light: #ff9a44; --accent-soft: rgba(245, 121, 0, 0.12); --icon: #333333; --modal-header-bg: rgba(0,0,0,0.04); --modal-body-bg: rgba(255,255,255,0.5); --modal-shadow: 0 20px 60px rgba(0,0,0,0.15);}
+body.light-mode .header, body.light-mode .menubar, body.light-mode .toolbar, body.light-mode .modal { background: rgba(255, 255, 255, 0.92); border-color: rgba(0,0,0,0.04); }
+body.light-mode .tool-btn svg, body.light-mode .tool-btn svg *, body.light-mode .tool-btn .icon, body.light-mode .tool-btn .icon * { stroke: #333333 !important; }
+</style>
+</head>
+<body>
+
+<div id="globalTooltip"></div>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <symbol id="i-new" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3.5 13.5h5l2 3h3l2-3h5"/><path d="M6 5h12l2.5 8.5V19h-17v-5.5Z"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3.5 3 10.5l7 3 3 7Z"/><path d="M21 3.5 10 13.5"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3.5h8l4 4V20.5H6Z"/><path d="M14 3.5V8h4"/><path d="M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 4 2.4 5 5.6.7-4.1 3.8 1.1 5.5-5-2.8-5 2.8 1.1-5.5L4 9.7 9.6 9Z"/></symbol>
+    <symbol id="i-tag" viewBox="0 0 24 24"><path d="M20.5 13 13 20.5 3.5 11V3.5H11Z"/><path d="M7.5 7.5h.1"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9.5 7V4.5h5V7"/><path d="M6.5 7l1 13h9l1-13"/><path d="M10 11v5M14 11v5"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4.5" rx="1"/><path d="M5 8.5V20h14V8.5"/><path d="M10 12.5h4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3.5 21.5 20h-19Z"/><path d="M12 10v4.5"/><path d="M12 17.5v.1"/></symbol>
+    <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 9l-5 5 5 5"/><path d="M4 14h10a6 6 0 0 1 6 6"/></symbol>
+    <symbol id="i-forward" viewBox="0 0 24 24"><path d="M15 9l5 5-5 5"/><path d="M20 14H10a6 6 0 0 0-6 6"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V3.5h10V8"/><rect x="3.5" y="8" width="17" height="8.5" rx="2"/><path d="M7 13.5h10v7H7Z"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7"/><path d="M20 4v4.3h-4.3"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.2 5.2l1.7 1.7M17.1 17.1l1.7 1.7M18.8 5.2l-1.7 1.7M6.9 17.1l-1.7 1.7"/></symbol>
+  </defs>
+</svg>
+
+<div class="header">
+  <img src="drimahemails.png" alt="Logo Drimah Emails" class="brand-logo" id="headerLogo" onerror="this.style.display='none'">
+  <div class="brand-name">Drimah Emails</div>
+  <span class="project-title" id="projectTitleDisplay">Sem Título</span>
+</div>
+
+<div class="menubar">
+  <div class="menu-wrapper"><div class="menu-item" onclick="toggleMenu('dropdown-file')"><span data-i18n="menuFile">Arquivo</span></div>
+    <div class="dropdown" id="dropdown-file">
+      <div class="dropdown-item" onclick="newFile();closeAllMenus()"><span data-i18n="new">Novo Projeto</span> <span class="shortcut">Ctrl+N</span></div>
+      <div class="dropdown-item" onclick="openFile();closeAllMenus()"><span data-i18n="open">Abrir...</span> <span class="shortcut">Ctrl+O</span></div>
+      <div class="dropdown-item" onclick="saveFile();closeAllMenus()"><span data-i18n="save">Salvar</span> <span class="shortcut">Ctrl+S</span></div>
+      <div class="dropdown-item" onclick="saveFileAs();closeAllMenus()"><span data-i18n="saveAs">Salvar Como...</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="printFullProject();closeAllMenus()"><span data-i18n="print">Imprimir Projeto Completo</span> <span class="shortcut">Ctrl+P</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="closeApp();closeAllMenus()"><span data-i18n="exit">Sair</span> <span class="shortcut">Ctrl+Q</span></div>
+    </div>
+  </div>
+  <div class="menu-wrapper"><div class="menu-item" onclick="toggleMenu('dropdown-edit')"><span data-i18n="menuEdit">Editar</span></div>
+    <div class="dropdown" id="dropdown-edit">
+      <div class="dropdown-item" onclick="document.execCommand('undo');closeAllMenus()"><span data-i18n="undo">Desfazer</span> <span class="shortcut">Ctrl+Z</span></div>
+      <div class="dropdown-item" onclick="document.execCommand('redo');closeAllMenus()"><span data-i18n="redo">Refazer</span> <span class="shortcut">Ctrl+Y</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item" onclick="document.execCommand('cut');closeAllMenus()"><span data-i18n="cut">Cortar</span> <span class="shortcut">Ctrl+X</span></div>
+      <div class="dropdown-item" onclick="document.execCommand('copy');closeAllMenus()"><span data-i18n="copy">Copiar</span> <span class="shortcut">Ctrl+C</span></div>
+      <div class="dropdown-item" onclick="document.execCommand('paste');closeAllMenus()"><span data-i18n="paste">Colar</span> <span class="shortcut">Ctrl+V</span></div>
+    </div>
+  </div>
+  <div class="menu-wrapper"><div class="menu-item" onclick="toggleMenu('dropdown-view')"><span data-i18n="menuView">Exibir</span></div>
+    <div class="dropdown" id="dropdown-view">
+      <div class="dropdown-item" onclick="toggleExplorer();closeAllMenus()"><span data-i18n="toggleExplorer">Alternar Explorador</span></div>
+      <div class="dropdown-item" onclick="toggleTheme();closeAllMenus()"><span data-i18n="toggleTheme">Alternar Tema</span></div>
+    </div>
+  </div>
+  <div class="menu-wrapper"><div class="menu-item" onclick="toggleMenu('dropdown-tools')"><span data-i18n="menuTools">Configurações</span></div>
+    <div class="dropdown" id="dropdown-tools">
+      <div class="dropdown-item" onclick="openAccounts();closeAllMenus()"><span data-i18n="setAccounts">Contas</span></div>
+      <div class="dropdown-item" onclick="openLabels();closeAllMenus()"><span data-i18n="setLabels">Marcadores</span></div>
+      <div class="dropdown-item" onclick="openSignatures();closeAllMenus()"><span data-i18n="setSignatures">Assinaturas</span></div>
+      <div class="separator"></div>
+      <div class="dropdown-item lang-submenu"><span data-i18n="themes">Temas</span>
+        <div class="lang-dropdown" id="themeDropdown">
+          <div class="dropdown-item" onclick="applyTheme('default');closeAllMenus()">Padrão</div>
+          <div class="dropdown-item" onclick="applyTheme('dark');closeAllMenus()">Escuro</div>
+          <div class="dropdown-item" onclick="applyTheme('midnight');closeAllMenus()">Meia-Noite</div>
+          <div class="dropdown-item" onclick="applyTheme('forest');closeAllMenus()">Floresta</div>
+          <div class="dropdown-item" onclick="applyTheme('purple');closeAllMenus()">Roxo</div>
+          <div class="dropdown-item" onclick="applyTheme('coffee');closeAllMenus()">Café</div>
+          <div class="dropdown-item" onclick="applyTheme('metallic');closeAllMenus()">Metálico</div>
+          <div class="dropdown-item" onclick="applyTheme('ocean');closeAllMenus()">Oceano</div>
+          <div class="dropdown-item" onclick="applyTheme('sunset');closeAllMenus()">Pôr do Sol</div>
+          <div class="dropdown-item" onclick="applyTheme('mint');closeAllMenus()">Menta</div>
+          <div class="dropdown-item" onclick="applyTheme('rose');closeAllMenus()">Rosa</div>
+          <div class="dropdown-item" onclick="applyTheme('pride');closeAllMenus()">Pride</div>
+        </div>
+      </div>
+      <div class="separator"></div>
+      <div class="dropdown-item lang-submenu"><span data-i18n="language">Idioma</span>
+        <div class="lang-dropdown" id="languageDropdown">
+          <div class="dropdown-item" onclick="setLanguage('en');closeAllMenus()">Inglês</div>
+          <div class="dropdown-item" onclick="setLanguage('pt');closeAllMenus()">Português</div>
+          <div class="dropdown-item" onclick="setLanguage('es');closeAllMenus()">Espanhol</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="menu-wrapper"><div class="menu-item" onclick="toggleMenu('dropdown-help')"><span data-i18n="menuHelp">Ajuda</span></div>
+    <div class="dropdown" id="dropdown-help">
+      <div class="dropdown-item" onclick="showAbout();closeAllMenus()"><span data-i18n="about">Sobre</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar" id="mainToolbar">
+  <button class="tool-btn" onclick="openCompose()" data-tooltip="new"><svg class="icon"><use href="#i-new"/></svg></button>
+  <button class="tool-btn" onclick="syncMessages()" data-tooltip="sync"><svg class="icon"><use href="#i-sync"/></svg></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="replyMessage()" data-tooltip="reply"><svg class="icon"><use href="#i-reply"/></svg></button>
+  <button class="tool-btn" onclick="forwardMessage()" data-tooltip="forward"><svg class="icon"><use href="#i-forward"/></svg></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="archiveMessage()" data-tooltip="archive"><svg class="icon"><use href="#i-archive"/></svg></button>
+  <button class="tool-btn" onclick="spamMessage()" data-tooltip="spam"><svg class="icon"><use href="#i-alert"/></svg></button>
+  <button class="tool-btn" onclick="deleteMessage()" data-tooltip="delete"><svg class="icon"><use href="#i-trash"/></svg></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="toggleFavorite()" data-tooltip="fav"><svg class="icon"><use href="#i-star"/></svg></button>
+  <button class="tool-btn" onclick="toggleLabel()" data-tooltip="label"><svg class="icon"><use href="#i-tag"/></svg></button>
+  <div class="tool-sep"></div>
+  <button class="tool-btn" onclick="printCurrent()" data-tooltip="print"><svg class="icon"><use href="#i-print"/></svg></button>
+</div>
+
+<div class="main">
+  <div class="explorer" id="explorer">
+    <div class="explorer-header"><span id="explorerTitle">Pastas</span><span id="itemCount">0</span></div>
+    <div class="explorer-header-bar"><svg class="icon icon-sm" style="stroke:white;margin-right:6px"><use href="#i-inbox"/></svg><span id="explorerHeaderTitle">Pastas e Marcadores</span></div>
+    <div class="explorer-content" id="explorerContent"><div id="explorerList"></div></div>
+  </div>
+
+  <div class="list-pane">
+    <div class="list-head"><span id="listTitle">Entrada</span><span id="listCount">0</span></div>
+    <div class="list-box" id="listBox"></div>
+  </div>
+
+  <div class="reading-pane" id="readingPane">
+    <div class="empty" id="emptyReading"><svg class="icon" style="width:48px;height:48px;"><use href="#i-mail"/></svg><span>Selecione uma mensagem para ler</span></div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <span id="statusText">Pronto</span>
+  <div class="status-indicators">
+    <span class="status-ind"><span data-i18n="messages">Mensagens</span> <b id="totalCount">0</b></span>
+    <span class="status-ind"><span data-i18n="unread">Não lidas</span> <b id="unreadCount">0</b></span>
+    <span class="status-ind" id="langIndicator">🇧🇷 PT</span>
+  </div>
+</div>
+
+<!-- MODAIS -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal"><div class="modal-header"><h2 id="modalTitle">Título</h2><button class="modal-close-btn" onclick="closeModal()">✕</button></div><div class="modal-body" id="modalContent"></div><div class="modal-footer"><button class="btn btn-primary" onclick="closeModal()" data-i18n="close">Fechar</button></div></div>
+</div>
+<div class="modal-overlay" id="confirmModalOverlay" onclick="if(event.target===this)closeConfirmModal()">
+  <div class="modal"><div class="modal-header"><h2 id="confirmModalTitle">Confirmar</h2><button class="modal-close-btn" onclick="closeConfirmModal()">✕</button></div><div class="modal-body" id="confirmModalContent"></div><div class="modal-footer"><button class="btn btn-secondary" id="confirmModalCancel" onclick="closeConfirmModal()" data-i18n="cancel">Cancelar</button><button class="btn btn-primary" id="confirmModalOk" onclick="confirmModalAction()" data-i18n="ok">OK</button></div></div>
+</div>
+<div class="modal-overlay" id="inputModalOverlay" onclick="if(event.target===this)closeInputModal()">
+  <div class="modal"><div class="modal-header"><h2 id="inputModalTitle">Entrada</h2><button class="modal-close-btn" onclick="closeInputModal()">✕</button></div><div class="modal-body" id="inputModalContent"></div><div class="modal-footer"><button class="btn btn-secondary" onclick="closeInputModal()" data-i18n="cancel">Cancelar</button><button class="btn btn-primary" id="inputModalOk" onclick="inputModalAction()" data-i18n="ok">OK</button></div></div>
+</div>
+<div class="modal-overlay" id="alertModalOverlay" onclick="if(event.target===this)closeAlertModal()">
+  <div class="modal"><div class="modal-header"><h2 id="alertModalTitle">Aviso</h2><button class="modal-close-btn" onclick="closeAlertModal()">✕</button></div><div class="modal-body" id="alertModalContent"></div><div class="modal-footer"><button class="btn btn-primary" onclick="closeAlertModal()" data-i18n="ok">OK</button></div></div>
+</div>
+
+<input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileOpen(event)">
+
+<script>
+let currentLang = 'pt';
+let currentTheme = 'default';
+let selectedMessageId = null;
+let messages = [];
+let labels = [];
+let accounts = [];
+let signatures = [];
+let currentView = 'inbox';
+let currentAccountFilter = 'all';
+const RELAY_URL = 'https://good-camel-1608.drimah.deno.net';
+
+const translations = {
+  pt: { menuFile: 'Arquivo', menuEdit: 'Editar', menuView: 'Exibir', menuTools: 'Configurações', menuHelp: 'Ajuda',
+    new: 'Novo Projeto', open: 'Abrir...', save: 'Salvar', saveAs: 'Salvar Como...',
+    print: 'Imprimir Projeto Completo', exit: 'Sair',
+    undo: 'Desfazer', redo: 'Refazer', cut: 'Cortar', copy: 'Copiar', paste: 'Colar',
+    toggleExplorer: 'Alternar Explorador', toggleTheme: 'Alternar Tema',
+    themes: 'Temas', language: 'Idioma',
+    setAccounts: 'Contas', setLabels: 'Marcadores', setSignatures: 'Assinaturas',
+    about: 'Sobre', close: 'Fechar', cancel: 'Cancelar', ok: 'OK',
+    messages: 'Mensagens', unread: 'Não lidas', ready: 'Pronto', noMessages: 'Nenhuma mensagem', selectMessage: 'Selecione uma mensagem para ler'
+  },
+  en: { menuFile: 'File', menuEdit: 'Edit', menuView: 'View', menuTools: 'Settings', menuHelp: 'Help',
+    new: 'New Project', open: 'Open...', save: 'Save', saveAs: 'Save As...',
+    print: 'Print Full Project', exit: 'Exit',
+    undo: 'Undo', redo: 'Redo', cut: 'Cut', copy: 'Copy', paste: 'Paste',
+    toggleExplorer: 'Toggle Explorer', toggleTheme: 'Toggle Theme',
+    themes: 'Themes', language: 'Language',
+    setAccounts: 'Accounts', setLabels: 'Labels', setSignatures: 'Signatures',
+    about: 'About', close: 'Close', cancel: 'Cancel', ok: 'OK',
+    messages: 'Messages', unread: 'Unread', ready: 'Ready', noMessages: 'No messages', selectMessage: 'Select a message to read'
+  },
+  es: { menuFile: 'Archivo', menuEdit: 'Editar', menuView: 'Ver', menuTools: 'Configuración', menuHelp: 'Ayuda',
+    new: 'Nuevo Proyecto', open: 'Abrir...', save: 'Guardar', saveAs: 'Guardar Como...',
+    print: 'Imprimir Proyecto Completo', exit: 'Salir',
+    undo: 'Deshacer', redo: 'Rehacer', cut: 'Cortar', copy: 'Copiar', paste: 'Pegar',
+    toggleExplorer: 'Alternar Explorador', toggleTheme: 'Alternar Tema',
+    themes: 'Temas', language: 'Idioma',
+    setAccounts: 'Cuentas', setLabels: 'Marcadores', setSignatures: 'Firmas',
+    about: 'Acerca de', close: 'Cerrar', cancel: 'Cancelar', ok: 'Aceptar',
+    messages: 'Mensajes', unread: 'No leídas', ready: 'Listo', noMessages: 'No hay mensajes', selectMessage: 'Seleccione un mensaje para leer'
+  }
+};
+
+function t(key) { return translations[currentLang]?.[key] || key; }
+
+// ==================== TOOLTIP TRADUZIDO ====================
+const tooltipsMap = {
+    pt: {
+        new: 'Nova mensagem', sync: 'Sincronizar', reply: 'Responder', forward: 'Encaminhar',
+        archive: 'Arquivar', spam: 'Marcar como spam', delete: 'Excluir', fav: 'Favoritar',
+        label: 'Marcador', print: 'Imprimir'
+    },
+    en: {
+        new: 'New message', sync: 'Sync', reply: 'Reply', forward: 'Forward',
+        archive: 'Archive', spam: 'Mark as spam', delete: 'Delete', fav: 'Favorite',
+        label: 'Label', print: 'Print'
+    },
+    es: {
+        new: 'Nuevo mensaje', sync: 'Sincronizar', reply: 'Responder', forward: 'Reenviar',
+        archive: 'Archivar', spam: 'Marcar como spam', delete: 'Eliminar', fav: 'Favorito',
+        label: 'Etiqueta', print: 'Imprimir'
+    }
+};
+
+function updateTooltips() {
+    const map = tooltipsMap[currentLang] || tooltipsMap.pt;
+    document.querySelectorAll('.tool-btn[data-tooltip]').forEach(btn => {
+        const key = btn.getAttribute('data-tooltip');
+        if (map[key]) btn.setAttribute('data-tooltip', map[key]);
+    });
+}
+
+// Tooltip flutuante global (não é cortado pelo overflow da barra de ferramentas)
+(function() {
+    const tip = document.getElementById('globalTooltip');
+    if (!tip) return;
+
+    function showTip(target) {
+        const text = target.getAttribute('data-tooltip');
+        if (!text) return;
+        tip.textContent = text;
+        tip.classList.add('visible');
+
+        const r = target.getBoundingClientRect();
+        tip.style.top = '0px';
+        tip.style.left = '0px';
+        const tipRect = tip.getBoundingClientRect();
+
+        let left = r.left + (r.width / 2) - (tipRect.width / 2);
+        let top = r.bottom + 6;
+
+        left = Math.max(4, Math.min(left, window.innerWidth - tipRect.width - 4));
+        if (top + tipRect.height > window.innerHeight - 4) {
+            top = r.top - tipRect.height - 6;
+        }
+
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+    }
+
+    function hideTip() {
+        tip.classList.remove('visible');
+    }
+
+    document.addEventListener('mouseover', function(e) {
+        const target = e.target.closest('[data-tooltip]');
+        if (target) showTip(target);
+    });
+
+    document.addEventListener('mouseout', function(e) {
+        const target = e.target.closest('[data-tooltip]');
+        if (target) hideTip();
+    });
+
+    document.addEventListener('click', hideTip);
+    window.addEventListener('scroll', hideTip, true);
+})();
+
+function toggleMenu(menuId) {
+    const dropdown = document.getElementById(menuId);
+    if (!dropdown) return;
+    if (dropdown.style.display === 'block') { dropdown.style.display = 'none'; return; }
+    closeAllMenus();
+    dropdown.style.display = 'block';
+}
+function closeAllMenus() { document.querySelectorAll('.dropdown').forEach(d => d.style.display = 'none'); }
+document.addEventListener('click', function(e) { if (!e.target.closest('.menu-wrapper')) closeAllMenus(); });
+
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('drimah_language', lang);
+    const langMap = { en: '🇺🇸 EN', pt: '🇧🇷 PT', es: '🇪🇸 ES' };
+    document.getElementById('langIndicator').textContent = langMap[lang] || '🇧🇷 PT';
+    document.getElementById('statusText').textContent = t('ready');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[lang]?.[key]) el.textContent = translations[lang][key];
+    });
+    updateExplorer();
+    updateTooltips();
+}
+function loadSavedLanguage() {
+    const savedLang = localStorage.getItem('drimah_language');
+    return (savedLang && translations[savedLang]) ? savedLang : 'pt';
+}
+
+const themes = {
+  default: { '--bg-0': '#1a1a1a', '--bg-1': '#2d2d2d', '--bg-2': '#383838', '--bg-3': '#444444', '--bg-hover': '#4a4a4a', '--border': 'rgba(255,255,255,0.06)', '--border-strong': 'rgba(255,255,255,0.1)', '--accent': '#f57900', '--accent-dark': '#cc5f00', '--accent-light': '#ff9a44', '--accent-soft': 'rgba(245,121,0,0.15)', '--modal-header-bg': 'rgba(0,0,0,0.3)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  dark: { '--bg-0': '#0f0f0f', '--bg-1': '#1a1a1a', '--bg-2': '#252525', '--bg-3': '#333333', '--bg-hover': '#404040', '--border': 'rgba(255,255,255,0.05)', '--border-strong': 'rgba(255,255,255,0.1)', '--accent': '#f57900', '--accent-dark': '#cc5f00', '--accent-light': '#ff9a44', '--accent-soft': 'rgba(245,121,0,0.15)', '--modal-header-bg': 'rgba(0,0,0,0.4)', '--modal-body-bg': 'rgba(255,255,255,0.02)' },
+  midnight: { '--bg-0': '#0d1525', '--bg-1': '#162036', '--bg-2': '#1e2d4a', '--bg-3': '#2a3d5e', '--bg-hover': '#354a70', '--border': 'rgba(100,160,255,0.1)', '--border-strong': 'rgba(100,160,255,0.18)', '--accent': '#5b9cf5', '--accent-dark': '#4a8af4', '--accent-light': '#7ab8ff', '--accent-soft': 'rgba(91,156,245,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  forest: { '--bg-0': '#0f1f14', '--bg-1': '#162d1e', '--bg-2': '#1f3d28', '--bg-3': '#2a5035', '--bg-hover': '#356342', '--border': 'rgba(120,210,130,0.1)', '--border-strong': 'rgba(120,210,130,0.18)', '--accent': '#4cd97a', '--accent-dark': '#3cb371', '--accent-light': '#6ef09a', '--accent-soft': 'rgba(76,217,122,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  purple: { '--bg-0': '#1a1028', '--bg-1': '#25183a', '--bg-2': '#35224d', '--bg-3': '#462e60', '--bg-hover': '#573a73', '--border': 'rgba(180,120,255,0.1)', '--border-strong': 'rgba(180,120,255,0.18)', '--accent': '#b57cf5', '--accent-dark': '#9b59b6', '--accent-light': '#cca0f5', '--accent-soft': 'rgba(181,124,245,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  coffee: { '--bg-0': '#1f1410', '--bg-1': '#2e1e16', '--bg-2': '#3e2a1e', '--bg-3': '#503826', '--bg-hover': '#624630', '--border': 'rgba(210,160,110,0.1)', '--border-strong': 'rgba(210,160,110,0.18)', '--accent': '#d49a6a', '--accent-dark': '#c97d4a', '--accent-light': '#e8b88a', '--accent-soft': 'rgba(212,154,106,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  metallic: { '--bg-0': '#1e1e24', '--bg-1': '#2a2a34', '--bg-2': '#3a3a48', '--bg-3': '#4a4a5c', '--bg-hover': '#5a5a70', '--border': 'rgba(180,180,200,0.1)', '--border-strong': 'rgba(180,180,200,0.18)', '--accent': '#a0a8b8', '--accent-dark': '#8a94a8', '--accent-light': '#b8c0d0', '--accent-soft': 'rgba(160,168,184,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.3)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  ocean: { '--bg-0': '#0a1f33', '--bg-1': '#0f2e4d', '--bg-2': '#163d66', '--bg-3': '#1e4d80', '--bg-hover': '#265c99', '--border': 'rgba(100,180,255,0.1)', '--border-strong': 'rgba(100,180,255,0.18)', '--accent': '#4da6ff', '--accent-dark': '#3390e8', '--accent-light': '#6ebfff', '--accent-soft': 'rgba(77,166,255,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  sunset: { '--bg-0': '#1f1010', '--bg-1': '#331818', '--bg-2': '#4a2020', '--bg-3': '#5e2a2a', '--bg-hover': '#733535', '--border': 'rgba(255,140,100,0.1)', '--border-strong': 'rgba(255,140,100,0.18)', '--accent': '#ff7a5c', '--accent-dark': '#e85a3a', '--accent-light': '#ff9a7a', '--accent-soft': 'rgba(255,122,92,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  mint: { '--bg-0': '#0f1f18', '--bg-1': '#162e24', '--bg-2': '#1f3d30', '--bg-3': '#2a503e', '--bg-hover': '#35634c', '--border': 'rgba(100,230,180,0.1)', '--border-strong': 'rgba(100,230,180,0.18)', '--accent': '#4dd9a0', '--accent-dark': '#2ecc71', '--accent-light': '#6ef0b8', '--accent-soft': 'rgba(77,217,160,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  rose: { '--bg-0': '#1f1018', '--bg-1': '#331828', '--bg-2': '#4a2038', '--bg-3': '#5e2a48', '--bg-hover': '#733558', '--border': 'rgba(255,120,180,0.1)', '--border-strong': 'rgba(255,120,180,0.18)', '--accent': '#f57ab8', '--accent-dark': '#e84393', '--accent-light': '#ff9ad0', '--accent-soft': 'rgba(245,122,184,0.18)', '--modal-header-bg': 'rgba(0,0,0,0.35)', '--modal-body-bg': 'rgba(255,255,255,0.04)' },
+  pride: { '--bg-0': '#ffffff', '--bg-1': '#ffffff', '--bg-2': '#f8f8f8', '--bg-3': '#f0f0f0', '--bg-hover': '#e8e8e8', '--border': 'rgba(200,200,200,0.30)', '--border-strong': 'rgba(200,200,200,0.50)', '--accent': '#ff5722', '--accent-dark': '#e64a19', '--accent-light': '#ff8a65', '--accent-soft': 'rgba(255,87,34,0.15)', '--modal-header-bg': 'rgba(255,255,255,0.95)', '--modal-body-bg': 'rgba(255,255,255,0.80)' }
+};
+
+function applyTheme(themeName) {
+  const root = document.documentElement.style;
+  const theme = themes[themeName];
+  if (!theme) return;
+  Object.entries(theme).forEach(([key, value]) => root.setProperty(key, value));
+  document.body.setAttribute('data-theme', themeName);
+  currentTheme = themeName;
+  localStorage.setItem('drimah_theme', themeName);
+}
+function loadSavedTheme() {
+  const savedTheme = localStorage.getItem('drimah_theme');
+  if (savedTheme && themes[savedTheme]) applyTheme(savedTheme);
+}
+
+function loadData() {
+    try {
+        const saved = localStorage.getItem('drimah_email_data');
+        if (saved) {
+            const data = JSON.parse(saved);
+            messages = data.messages || [];
+            labels = data.labels || [];
+            accounts = data.accounts || [];
+            signatures = data.signatures || [];
+            currentView = data.currentView || 'inbox';
+        }
+    } catch (e) { console.warn('Erro ao carregar dados:', e); }
+}
+function saveData() {
+    try {
+        const data = { messages, labels, accounts, signatures, currentView };
+        localStorage.setItem('drimah_email_data', JSON.stringify(data));
+    } catch (e) { console.warn('Erro ao salvar dados:', e); }
+}
+
+let alertCallback = null;
+function showAlert(title, message, callback) {
+    document.getElementById('alertModalTitle').textContent = title || 'Aviso';
+    document.getElementById('alertModalContent').innerHTML = `<p>${message}</p>`;
+    alertCallback = callback || null;
+    document.getElementById('alertModalOverlay').classList.add('active');
+}
+function closeAlertModal() {
+    document.getElementById('alertModalOverlay').classList.remove('active');
+    if (alertCallback) { const cb = alertCallback; alertCallback = null; cb(); }
+}
+
+let confirmCallback = null;
+function showConfirm(title, message, okText, cancelText, callback) {
+    document.getElementById('confirmModalTitle').textContent = title || 'Confirmar';
+    document.getElementById('confirmModalContent').innerHTML = `<p>${message}</p>`;
+    document.getElementById('confirmModalOk').textContent = okText || 'OK';
+    document.getElementById('confirmModalCancel').textContent = cancelText || 'Cancelar';
+    confirmCallback = callback || null;
+    document.getElementById('confirmModalOverlay').classList.add('active');
+}
+function closeConfirmModal() {
+    document.getElementById('confirmModalOverlay').classList.remove('active');
+    if (confirmCallback) { const cb = confirmCallback; confirmCallback = null; cb(false); }
+}
+function confirmModalAction() {
+    document.getElementById('confirmModalOverlay').classList.remove('active');
+    if (confirmCallback) { const cb = confirmCallback; confirmCallback = null; cb(true); }
+}
+
+let inputCallback = null;
+function showInput(title, message, defaultValue, placeholder, callback) {
+    document.getElementById('inputModalTitle').textContent = title || 'Entrada';
+    document.getElementById('inputModalContent').innerHTML = `
+        <p>${message || ''}</p>
+        <input type="text" id="inputModalField" value="${defaultValue || ''}" placeholder="${placeholder || ''}">
+    `;
+    inputCallback = callback || null;
+    document.getElementById('inputModalOverlay').classList.add('active');
+    setTimeout(() => { const field = document.getElementById('inputModalField'); if (field) { field.focus(); field.select(); } }, 100);
+}
+function closeInputModal() {
+    document.getElementById('inputModalOverlay').classList.remove('active');
+    if (inputCallback) { const cb = inputCallback; inputCallback = null; cb(null); }
+}
+function inputModalAction() {
+    const field = document.getElementById('inputModalField');
+    const value = field ? field.value : '';
+    document.getElementById('inputModalOverlay').classList.remove('active');
+    if (inputCallback) { const cb = inputCallback; inputCallback = null; cb(value); }
+}
+
+function updateExplorer() {
+    const list = document.getElementById('explorerList');
+    const folders = [
+        { id: 'inbox', icon: 'inbox', label: t('Entrada') },
+        { id: 'favorites', icon: 'star', label: t('Favoritos') },
+        { id: 'sent', icon: 'send', label: t('Enviados') },
+        { id: 'drafts', icon: 'file', label: t('Rascunhos') },
+        { id: 'archived', icon: 'archive', label: t('Arquivados') },
+        { id: 'spam', icon: 'alert', label: t('Spam') },
+        { id: 'trash', icon: 'trash', label: t('Lixeira') }
+    ];
+    let html = '';
+    folders.forEach(f => {
+        const count = messages.filter(m => m.folder === f.id && !m.read).length;
+        const isActive = currentView === f.id ? 'on' : '';
+        html += `<button class="side-it ${isActive}" onclick="switchView('${f.id}')"><svg class="icon icon-sm"><use href="#i-${f.icon}"/></svg><span class="lbl">${f.label}</span>${count > 0 ? `<span class="side-cnt">${count}</span>` : ''}</button>`;
+    });
+
+    if (accounts.length > 0) {
+        html += `<div class="side-title"><span>Contas</span></div>`;
+        const allActive = currentAccountFilter === 'all' ? 'on' : '';
+        html += `<button class="side-it ${allActive}" onclick="switchAccountFilter('all')"><span class="dot" style="background:var(--accent)"></span><span class="lbl">Todas as contas</span></button>`;
+        accounts.forEach(acc => {
+            const isActive = currentAccountFilter === acc.email ? 'on' : '';
+            const initial = escapeHtml((acc.name || acc.email).charAt(0).toUpperCase());
+            html += `<button class="side-it ${isActive}" onclick="switchAccountFilter('${acc.email}')" title="${escapeHtml(acc.email)}"><span class="acc-avatar-sm">${initial}</span><span class="lbl">${escapeHtml(acc.name || acc.email)}</span></button>`;
+        });
+    }
+
+    html += `<div class="side-title"><span>${t('Marcadores')}</span></div>`;
+    labels.forEach(l => {
+        const count = messages.filter(m => (m.labels || []).includes(l.id) && !m.read).length;
+        const isActive = currentView === 'label-' + l.id ? 'on' : '';
+        html += `<button class="side-it ${isActive}" onclick="switchView('label-${l.id}')"><span class="dot" style="background:${l.color}"></span><span class="lbl">${l.name}</span>${count > 0 ? `<span class="side-cnt">${count}</span>` : ''}</button>`;
+    });
+    list.innerHTML = html;
+    document.getElementById('explorerTitle').textContent = t('Pastas');
+    document.getElementById('itemCount').textContent = '';
+}
+
+function switchAccountFilter(email) { currentAccountFilter = email; selectedMessageId = null; refreshUI(); }
+
+function escapeHtml(str) {
+    return String(str || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+function renderList() {
+    const box = document.getElementById('listBox');
+    let filtered = [];
+    if (currentView === 'inbox') filtered = messages.filter(m => m.folder === 'inbox');
+    else if (currentView === 'favorites') filtered = messages.filter(m => m.favorite);
+    else if (currentView === 'sent') filtered = messages.filter(m => m.folder === 'sent');
+    else if (currentView === 'drafts') filtered = messages.filter(m => m.folder === 'drafts');
+    else if (currentView === 'archived') filtered = messages.filter(m => m.folder === 'archived');
+    else if (currentView === 'spam') filtered = messages.filter(m => m.folder === 'spam');
+    else if (currentView === 'trash') filtered = messages.filter(m => m.folder === 'trash');
+    else if (currentView.startsWith('label-')) {
+        const labelId = currentView.replace('label-', '');
+        filtered = messages.filter(m => (m.labels || []).includes(labelId));
+    }
+    if (currentAccountFilter !== 'all') {
+        filtered = filtered.filter(m => m.from?.accountEmail === currentAccountFilter);
+    }
+    filtered.sort((a, b) => b.date - a.date);
+    document.getElementById('listTitle').textContent = document.querySelector(`.side-it.on .lbl`)?.textContent || 'Entrada';
+    document.getElementById('listCount').textContent = filtered.length;
+    document.getElementById('totalCount').textContent = messages.length;
+    document.getElementById('unreadCount').textContent = messages.filter(m => !m.read).length;
+    if (filtered.length === 0) {
+        box.innerHTML = `<div class="empty"><svg class="icon" style="width:48px;height:48px;"><use href="#i-mail"/></svg><span>${t('noMessages')}</span></div>`;
+        return;
+    }
+    let html = '';
+    filtered.forEach(m => {
+        const isUnread = !m.read ? 'unread' : '';
+        const isSelected = selectedMessageId === m.id ? 'sel' : '';
+        const fromName = escapeHtml(m.from?.name || 'Desconhecido');
+        const subject = escapeHtml(m.subject || '(sem assunto)');
+        const date = new Date(m.date).toLocaleDateString();
+        html += `<div class="msg ${isUnread} ${isSelected}" onclick="selectMessage('${m.id}')"><div class="msg-top"><span class="msg-from">${fromName}</span><span class="msg-date">${date}</span></div><div class="msg-subj">${subject}</div></div>`;
+    });
+    box.innerHTML = html;
+}
+
+function renderReading() {
+    const pane = document.getElementById('readingPane');
+    if (!selectedMessageId) { pane.innerHTML = `<div class="empty"><svg class="icon" style="width:48px;height:48px;"><use href="#i-mail"/></svg><span>${t('selectMessage')}</span></div>`; return; }
+    const m = messages.find(msg => msg.id === selectedMessageId);
+    if (!m) return;
+    const fromName = escapeHtml(m.from?.name || 'Desconhecido');
+    const fromEmail = escapeHtml(m.from?.email || '');
+    const subject = escapeHtml(m.subject || '(sem assunto)');
+    const date = new Date(m.date).toLocaleString();
+    pane.innerHTML = `<div class="rd"><div class="rd-header"><span class="avatar">${fromName.charAt(0).toUpperCase()}</span><div class="rd-title-block"><div class="rd-sender-row"><span class="rd-sender-name">${fromName}</span><span class="rd-date">${date}</span></div><div class="rd-subject">${subject}</div><div class="rd-email">${fromEmail}</div></div></div><div class="rd-scroll"><div class="rd-body" id="rdBodyContainer"></div></div></div>`;
+
+    const container = document.getElementById('rdBodyContainer');
+
+    // Mensagens antigas da versão anterior podem ter ficado salvas como
+    // bodyLoaded=true, mas sem corpo (por uma resposta vazia/transitória do relay).
+    // Nesse caso precisamos buscar novamente em vez de deixar a tela em branco.
+    const savedError = String(m.body || '').trim().startsWith('❌ Não foi possível carregar o conteúdo desta mensagem.');
+    const hasBody = !!(m.bodyHtml && String(m.bodyHtml).trim()) || (!!(m.body && String(m.body).trim()) && !savedError);
+    if (m.bodyLoaded === false || !hasBody || savedError) {
+        container.innerHTML = `<div style="padding:20px;color:#888;">⏳ Carregando mensagem...</div>`;
+        loadMessageBody(m);
+        return;
+    }
+
+    renderBodyInto(container, m);
+}
+
+// CSS injetado dentro de cada e-mail para: (1) impedir que o próprio HTML do
+// e-mail force uma altura/scroll interno (o que fazia aparecer barra de
+// rolagem e cortar o conteúdo), e (2) esconder o "preheader" (o texto de
+// pré-visualização que fica escondido no e-mail original, mas que alguns
+// templates deixam vazar como texto desconfigurado no topo).
+const EMAIL_FRAME_RESET_CSS = `
+html, body {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+}
+body {
+    overflow-x: hidden !important;
+}
+img, table, td, div, section, main {
+    max-width: 100% !important;
+}
+
+/* Elementos usados por newsletters como texto de pré-visualização. */
+[class*="preheader" i], [id*="preheader" i],
+[class*="preview-text" i], [id*="preview-text" i],
+[class*="previewtext" i], [id*="previewtext" i],
+[class*="hidden-preview" i], [id*="hidden-preview" i],
+[class*="hiddenpreview" i], [id*="hiddenpreview" i],
+[class*="mktoPreheaderText" i], [id*="mktoPreheaderText" i],
+[class*="email-preheader" i], [id*="email-preheader" i] {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+`;
+
+let currentReadingIframe = null;
+let currentEmailHtml = '';
+
+function sanitizeEmailHtml(rawHtml, message) {
+    /*
+     * PREHEADER NO HTML BRUTO
+     * Alguns remetentes entregam o preheader literalmente como texto solto
+     * antes da primeira tag estrutural do e-mail. O DOMParser pode reorganizar
+     * <style>/<head>, fazendo com que uma limpeza posterior perca a relação
+     * original entre esse texto e o conteúdo.
+     *
+     * Aqui removemos SOMENTE texto puro no início do HTML quando a próxima tag
+     * é claramente parte da estrutura de um e-mail (style, center, table, etc.).
+     * Não tocamos em texto que esteja dentro de uma tag HTML.
+     */
+    let sourceHtml = String(rawHtml || '');
+    sourceHtml = sourceHtml.replace(/^(?:\s|<!--(?:.|\n)*?-->)*([^<]{1,180})(?=\s*<(?:style|center|table|div|main|section|article|header|img|picture)\b)/i, '');
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(sourceHtml, 'text/html');
+
+    // Nunca executamos JavaScript recebido pelo servidor.
+    doc.querySelectorAll('script, noscript').forEach(el => el.remove());
+
+    const preheaderName = /preheader|preview[-_ ]?text|hidden[-_ ]?preview|mktoPreheaderText|email[-_ ]?preheader/i;
+
+    // Remove preheaders mesmo quando o e-mail não traz uma classe/id padronizada.
+    doc.querySelectorAll('*').forEach(el => {
+        const cls = typeof el.className === 'string' ? el.className : '';
+        const id = el.id || '';
+        const style = (el.getAttribute('style') || '').toLowerCase().replace(/\s/g, '');
+
+        if (preheaderName.test(cls) || preheaderName.test(id)) {
+            el.remove();
+            return;
+        }
+
+        // Muitos templates escondem o preheader apenas por estilo inline.
+        // Removemos somente elementos pequenos/sem conteúdo visual que estão
+        // explicitamente marcados como invisíveis.
+        const hiddenInline =
+            /display:none/.test(style) ||
+            /visibility:hidden/.test(style) ||
+            /max-height:0/.test(style) ||
+            /font-size:0(?:px)?/.test(style);
+
+        /*
+         * IMPORTANTE: em templates de e-mail (principalmente MJML)
+         * "font-size:0" é usado em DIVs de layout para eliminar espaços entre
+         * colunas. Esses DIVs CONTÊM o e-mail inteiro. Removê-los destrói a
+         * mensagem e foi a causa das telas brancas em alguns e-mails.
+         * Só removemos um elemento marcado como invisível quando ele não
+         * contém conteúdo visual nem elementos estruturais do e-mail.
+         */
+        // NÃO removemos genericamente elementos com display:none/visibility:hidden/
+        // font-size:0. Muitos templates de e-mail usam esses estilos em
+        // contêineres de layout e em blocos responsivos que ainda participam
+        // da estrutura da mensagem. A remoção fica restrita aos preheaders
+        // identificados explicitamente por classe/id acima.
+        // Isso evita apagar partes inteiras de e-mails como Gumroad.
+        void hiddenInline;
+    });
+
+    /*
+     * Alguns servidores retiram a classe do preheader e deixam apenas um
+     * pequeno texto como primeiro nó visível do BODY. É exatamente o padrão
+     * mostrado nos exemplos: uma frase/endereço aparece antes do logo ou
+     * conteúdo real. Removemos somente um primeiro bloco de texto curto,
+     * quando ele vem imediatamente antes do primeiro conteúdo visual.
+     */
+    const body = doc.body;
+    if (body) {
+        // Alguns disparadores inserem um identificador técnico de campanha
+        // no início da mensagem. Ex.: BZ_CRM_CLIENTES_EMAIL_JORNADA_...
+        // Ele não é o assunto nem faz parte do conteúdo visual do e-mail.
+        // Também é comum vir acompanhado de "Para visualizar este e-mail
+        // como página da web, acesse aqui.".
+        const technicalPreheader = /^(?:[A-Z0-9]+[_-]){2,}[A-Z0-9_-]{8,}(?:\\s+|<|$)/;
+        const webViewText = /para\\s+visualizar\\s+este\\s+e-?mail.*p[áa]gina\\s+da\\s+web/i;
+
+        const topNodes = Array.from(body.children).slice(0, 8);
+        topNodes.forEach(el => {
+            const txt = (el.textContent || '').replace(/\\s+/g, ' ').trim();
+            if (!txt || txt.length > 500) return;
+
+            const firstLine = txt.split(/(?=Para visualizar)|(?=para visualizar)|\\n/)[0].trim();
+            const hasTechnicalId = technicalPreheader.test(txt) ||
+                /^[A-Z0-9]+(?:_[A-Z0-9]+){3,}$/.test(firstLine);
+            const hasWebView = webViewText.test(txt);
+
+            if (hasTechnicalId && hasWebView) {
+                el.remove();
+            }
+        });
+
+        // Caso o identificador esteja em uma célula/tabela que também contém
+        // o link "acesse aqui", remove apenas a linha/célula técnica, preservando
+        // o restante do e-mail.
+        Array.from(body.querySelectorAll('tr, td, th, p, div, center')).slice(0, 40).forEach(el => {
+            const txt = (el.textContent || '').replace(/\\s+/g, ' ').trim();
+            if (!txt || txt.length > 350) return;
+
+            const hasTechnicalId =
+                /^[A-Z0-9]+(?:_[A-Z0-9]+){3,}(?:\\s|$)/.test(txt) ||
+                /^(?:[A-Z0-9]+[_-]){2,}[A-Z0-9_-]{8,}/.test(txt);
+            const hasWebView = webViewText.test(txt);
+
+            if (hasTechnicalId && hasWebView) {
+                // Se o elemento contém apenas esse cabeçalho técnico/link,
+                // remove-o. Não toca em tabelas que também tenham imagens.
+                const hasVisualContent = el.querySelector('img, picture, svg, video, canvas');
+                if (!hasVisualContent) el.remove();
+            }
+        });
+        // Alguns servidores entregam o preheader como TEXTO PURO diretamente
+        // dentro do BODY, antes do primeiro <div>/<table>. Nesse caso ele não
+        // aparece em body.children e a regra anterior não consegue removê-lo.
+        // Primeiro eliminamos somente um nó de texto inicial que seja igual ao
+        // assunto ou tenha formato típico de preheader.
+        // Também trata um nó de texto puro com identificador técnico de campanha.
+        Array.from(body.childNodes).forEach(node => {
+            if (node.nodeType !== Node.TEXT_NODE) return;
+            const txt = node.textContent.replace(/\\s+/g, ' ').trim();
+            if (/^[A-Z0-9]+(?:_[A-Z0-9]+){3,}$/.test(txt)) node.remove();
+        });
+
+        /*
+         * CORREÇÃO SEGURA DE PREHEADER
+         * -----------------------------
+         * Não removemos mais blocos genéricos só porque são curtos.
+         * Isso podia apagar o primeiro conteúdo legítimo de alguns e-mails.
+         *
+         * O caso ES-Builder que precisamos tratar é específico: um TEXTO PURO
+         * diretamente no BODY, antes do primeiro elemento visual. Nesse formato
+         * o texto está realmente solto no HTML e não faz parte de um parágrafo,
+         * tabela ou bloco do e-mail.
+         *
+         * Também removemos apenas a duplicação do assunto quando ele aparece
+         * sozinho como primeiro nó de texto.
+         */
+        const visibleNodes = Array.from(body.childNodes).filter(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                return node.textContent.replace(/\s+/g, ' ').trim() !== '';
+            }
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const tag = node.tagName.toLowerCase();
+                return !['script', 'noscript', 'style', 'template'].includes(tag);
+            }
+            return false;
+        });
+
+        const nodeHasVisual = node => {
+            if (!node || node.nodeType !== Node.ELEMENT_NODE) return false;
+            return !!node.querySelector('img, picture, table, svg, video, iframe, canvas');
+        };
+
+        const firstNode = visibleNodes[0];
+        const secondNode = visibleNodes[1];
+        const subjectText = message && message.subject
+            ? String(message.subject).replace(/\s+/g, ' ').trim()
+            : '';
+
+        // Caso ES-Builder: texto puro diretamente no BODY antes do conteúdo visual.
+        // Ex.: "Filmes que você vai curtir!"
+        if (
+            firstNode &&
+            firstNode.nodeType === Node.TEXT_NODE &&
+            secondNode &&
+            secondNode.nodeType === Node.ELEMENT_NODE &&
+            nodeHasVisual(secondNode)
+        ) {
+            const txt = firstNode.textContent.replace(/\s+/g, ' ').trim();
+
+            // Limite conservador: só um texto curto e realmente solto.
+            if (txt.length > 0 && txt.length <= 180) {
+                firstNode.remove();
+            }
+        }
+
+        // Alguns e-mails deixam o ALT/preheader como TEXTO PURO no topo
+        // (ex.: "Header Mapfre", "Campanha", "Logo"). Depois do DOMParser
+        // isso não é mais uma imagem: virou um nó de texto. Removemos somente
+        // quando está no começo e o próximo conteúdo é visual/estrutural.
+        const firstPlain = Array.from(body.childNodes).find(node => {
+            if (node.nodeType === Node.TEXT_NODE) return node.textContent.replace(/\s+/g, ' ').trim() !== '';
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const tag = node.tagName.toLowerCase();
+                return !['script','noscript','style','template'].includes(tag);
+            }
+            return false;
+        });
+        if (firstPlain && firstPlain.nodeType === Node.TEXT_NODE) {
+            const firstTxt = firstPlain.textContent.replace(/\s+/g, ' ').trim();
+            const badTopLabel = /^(?:header(?:\s+[a-z0-9à-ÿ._-]+)?|campanha|logo|logotipo|banner|imagem|image|marca|brand)$/i.test(firstTxt);
+            const nextPlain = Array.from(body.childNodes).find(node => {
+                if (node === firstPlain) return false;
+                if (node.nodeType === Node.TEXT_NODE) return node.textContent.replace(/\s+/g, ' ').trim() !== '';
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tag = node.tagName.toLowerCase();
+                    return !['script','noscript','style','template'].includes(tag);
+                }
+                return false;
+            });
+            const nextHasVisual = nextPlain && nextPlain.nodeType === Node.ELEMENT_NODE &&
+                !!nextPlain.querySelector('img, picture, table, svg, video, iframe, canvas');
+            if (badTopLabel && (nextHasVisual || !nextPlain || (nextPlain && nextPlain.nodeType === Node.ELEMENT_NODE))) firstPlain.remove();
+        }
+
+        // Alguns provedores transformam o texto do preheader em um pequeno
+        // <div>/<p>/<span> no topo. Tratamos somente rótulos inequívocos
+        // (Header Mapfre, Campanha, Logo, Banner etc.), sem tocar em blocos
+        // que contenham imagens/tabelas.
+        const topElements = Array.from(body.children).filter(el => {
+            const tag = el.tagName.toLowerCase();
+            return !['script','noscript','style','template'].includes(tag);
+        }).slice(0, 4);
+        topElements.forEach(el => {
+            const txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+            if (!txt || txt.length > 100) return;
+            const hasVisual = !!el.querySelector('img, picture, table, svg, video, iframe, canvas');
+            if (hasVisual) return;
+            if (/^(?:header(?:\s+[a-z0-9à-ÿ._-]+)?|campanha|logo|logotipo|banner|imagem|image|marca|brand)$/i.test(txt)) {
+                el.remove();
+            }
+        });
+
+        // Assunto duplicado como texto solto no início: caso inequívoco.
+        if (subjectText) {
+            const firstAfterCleanup = Array.from(body.childNodes).find(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    return node.textContent.replace(/\s+/g, ' ').trim() !== '';
+                }
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const tag = node.tagName.toLowerCase();
+                    return !['script', 'noscript', 'style', 'template'].includes(tag);
+                }
+                return false;
+            });
+
+            if (firstAfterCleanup) {
+                const txt = (firstAfterCleanup.textContent || '').replace(/\s+/g, ' ').trim();
+                const isPlainTextNode = firstAfterCleanup.nodeType === Node.TEXT_NODE;
+                const isSimpleElement = firstAfterCleanup.nodeType === Node.ELEMENT_NODE &&
+                    !firstAfterCleanup.querySelector('img, picture, table, svg, video, iframe, canvas');
+                // O assunto pode estar dentro de um <div>/<p>/<span>, e não
+                // diretamente como TextNode. Nesse caso também é seguro
+                // removê-lo quando ele é exatamente o assunto e está no topo.
+                if (txt === subjectText && (isPlainTextNode || isSimpleElement)) {
+                    firstAfterCleanup.remove();
+                }
+            }
+        }
+
+        /*
+         * LIMPEZA CIRÚRGICA DE RÓTULOS DE CABEÇALHO
+         *
+         * Alguns templates entregam o texto de um banner/logo quebrado como
+         * ALT (por exemplo "Header Mapfre") e outros colocam esse mesmo texto
+         * em um pequeno bloco de texto no topo. Não usamos posição ou tamanho
+         * para decidir nesses casos: só removemos rótulos inequívocos.
+         * Isso evita tocar no conteúdo normal do e-mail.
+         */
+        const genericTopLabel = /^(?:header(?:\s+[a-z0-9à-ÿ._-]+)?|campanha|logo|logotipo|banner|imagem|image|marca|brand)$/i;
+
+        // Se o rótulo for o ALT de uma imagem, remove a imagem em qualquer
+        // posição. Esses ALTs não são conteúdo editorial do e-mail.
+        body.querySelectorAll('img[alt]').forEach(img => {
+            const alt = (img.getAttribute('alt') || '').replace(/\s+/g, ' ').trim();
+            if (genericTopLabel.test(alt)) img.remove();
+        });
+
+        // O mesmo rótulo pode ter sido convertido em texto por um proxy/relay.
+        // Removemos apenas elementos muito simples, sem qualquer conteúdo visual.
+        Array.from(body.querySelectorAll('td,th,p,span,div,center')).slice(0, 80).forEach(el => {
+            const txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+            if (!genericTopLabel.test(txt)) return;
+            if (el.querySelector('img, picture, table, svg, video, iframe, canvas, a[href]')) return;
+            el.remove();
+        });
+
+        // Assunto no topo: pode estar dentro de um pequeno elemento, e não
+        // diretamente como primeiro nó do BODY. Só removemos a ocorrência
+        // inicial quando ela é exatamente igual ao assunto e não contém
+        // conteúdo visual.
+        if (subjectText) {
+            const candidates = Array.from(body.querySelectorAll('body > *, body > table *, body > div *'))
+                .slice(0, 120);
+            for (const el of candidates) {
+                const txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+                if (txt !== subjectText) continue;
+                if (el.querySelector('img, picture, table, svg, video, iframe, canvas, a[href]')) continue;
+                const rectLike = el.children.length === 0 || el.children.length === 1;
+                if (!rectLike) continue;
+                el.remove();
+                break;
+            }
+        }
+
+        /*
+         * Alguns e-mails exibem o ALT de uma imagem que falhou no carregamento.
+         * Não removemos a imagem aqui (o navegador ainda não a carregou).
+         * A remoção do ALT problemático é feita somente depois do load do iframe,
+         * quando podemos confirmar naturalWidth === 0 e comparar o ALT com o
+         * nome do remetente. Assim não afetamos imagens normais nem o layout.
+         */
+
+        const meaningful = Array.from(body.children).filter(el => {
+            const txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+            if (!txt) return false;
+            const cs = el.getAttribute('style') || '';
+            return !/display\s*:\s*none/i.test(cs);
+        });
+
+        if (meaningful.length >= 2) {
+            const first = meaningful[0];
+            const firstText = (first.textContent || '').replace(/\s+/g, ' ').trim();
+            const next = meaningful[1];
+            const nextTag = next.tagName.toLowerCase();
+
+            // Só considera preheader um bloco curto e textual no topo.
+            const isTextOnly = first.querySelector('img, table, video, svg, iframe, form') === null;
+            const isShort = firstText.length > 0 && firstText.length <= 180;
+            const nextLooksLikeContent = ['img','table','section','main','div','article','center'].includes(nextTag)
+                || !!next.querySelector('img, table');
+
+            // Endereços de e-mail e frases de preview são os casos mais comuns.
+            const looksLikePreview =
+                /@/.test(firstText) ||
+                /^(estamos|temos|confira|veja|saiba|mantenha|new content|novo|lembrete|você|voce)\b/i.test(firstText) ||
+                (message && message.subject && firstText === String(message.subject).trim());
+
+            if (isTextOnly && isShort && nextLooksLikeContent && looksLikePreview) {
+                first.remove();
+            }
+        }
+    }
+
+    // Retorna o documento já sanitizado. Mantém <head> e estilos originais.
+    return '<!DOCTYPE html>' + doc.documentElement.outerHTML;
+}
+
+function renderBodyInto(container, m) {
+    currentReadingIframe = null;
+    currentEmailHtml = '';
+
+    if (m.bodyHtml) {
+        container.innerHTML = '';
+        container.style.padding = '0';
+        container.style.overflow = 'visible';
+
+        const iframe = document.createElement('iframe');
+        iframe.sandbox = 'allow-same-origin';
+        iframe.scrolling = 'no';
+        iframe.style.width = '100%';
+        iframe.style.height = '1px';
+        iframe.style.minHeight = '1px';
+        iframe.style.border = 'none';
+        iframe.style.display = 'block';
+        iframe.style.overflow = 'hidden';
+        iframe.style.background = '#ffffff';
+        iframe.setAttribute('title', 'Conteúdo do e-mail');
+
+        let html = sanitizeEmailHtml(m.bodyHtml, m);
+        let resetCss = EMAIL_FRAME_RESET_CSS;
+        // Alguns templates (especialmente newsletters) usam texto branco
+        // sobre um fundo escuro definido no próprio HTML. Não forçamos mais
+        // fundo branco no BODY; para Gumroad, se o corpo vier sem fundo,
+        // preservamos a leitura usando o fundo claro somente nos elementos
+        // que explicitamente usam branco como cor e não possuem fundo próprio.
+        if (/gumroad/i.test(String(m.from?.name || '') + ' ' + String(m.from?.email || ''))) {
+            // Gumroad: alguns modelos chegam com fundo escuro e texto escuro,
+            // tornando o conteúdo praticamente invisível no leitor. Para Gumroad,
+            // usamos deliberadamente uma área de leitura limpa: fundo branco e
+            // texto preto. Esta regra é exclusiva do Gumroad e não altera os
+            // demais remetentes.
+            resetCss += `\nhtml, body { background: #ffffff !important; color: #111111 !important; }\nbody * { color: #111111 !important; }\n`;
+        }
+        const resetTag = `<style>${resetCss}</style>`;
+
+        if (/<head[^>]*>/i.test(html)) {
+            html = html.replace(/<head[^>]*>/i, match => match + resetTag);
+        } else {
+            html = html.replace(/<html[^>]*>/i, match => match + '<head>' + resetTag + '</head>');
+        }
+
+        currentEmailHtml = html;
+        iframe.srcdoc = html;
+
+        const resizeEmail = () => {
+            try {
+                const doc = iframe.contentDocument;
+                if (!doc || !doc.documentElement) return;
+
+                const body = doc.body;
+                const root = doc.documentElement;
+
+                // Mede o conteúdo real sem criar uma barra de rolagem dentro do iframe.
+                const h = Math.max(
+                    root.scrollHeight,
+                    root.offsetHeight,
+                    body ? body.scrollHeight : 0,
+                    body ? body.offsetHeight : 0
+                );
+
+                if (h > 0) {
+                    iframe.style.height = Math.ceil(h) + 'px';
+                }
+            } catch (e) {
+                // O iframe continua visível mesmo se algum e-mail bloquear a medição.
+            }
+        };
+
+        iframe.addEventListener('load', () => {
+            currentReadingIframe = iframe;
+
+            resizeEmail();
+
+            try {
+                const doc = iframe.contentDocument;
+
+                /*
+                 * Alguns e-mails mostram no topo o ALT de uma imagem que não
+                 * carregou (ex.: "Claro", "Adobe", "Udemy"). Só tratamos esse
+                 * caso quando:
+                 *   1) a imagem realmente falhou (naturalWidth === 0);
+                 *   2) o ALT é curto;
+                 *   3) o ALT corresponde a uma palavra do nome do remetente;
+                 *   4) a imagem está entre os primeiros elementos do e-mail.
+                 *
+                 * Assim não apagamos imagens legítimas de outros e-mails.
+                 */
+                const senderName = String(m.from?.name || '').trim();
+                const senderWords = senderName
+                    .toLowerCase()
+                    .replace(/[^a-z0-9À-ÿ]+/gi, ' ')
+                    .split(/\s+/)
+                    .filter(w => w.length >= 3);
+
+                const cleanBrokenTopAlt = () => {
+                    if (!senderWords.length) return;
+                    const topImages = Array.from(doc.querySelectorAll('img')).slice(0, 12);
+                    topImages.forEach(img => {
+                        const alt = String(img.getAttribute('alt') || '').replace(/\s+/g, ' ').trim();
+                        if (!alt || alt.length > 60) return;
+                        if (!img.complete || img.naturalWidth !== 0) return;
+
+                        const altNorm = alt.toLowerCase().replace(/[^a-z0-9À-ÿ]+/gi, ' ').trim();
+                        const matchesSender = senderWords.some(word => altNorm === word || altNorm.includes(' ' + word + ' ') || altNorm.startsWith(word + ' ') || altNorm.endsWith(' ' + word));
+
+                        // Alguns e-mails usam ALT genérico no primeiro banner/logotipo
+                        // (ex.: "Campanha", "Header Mapfre", "Logo"). Se a imagem
+                        // realmente falhou, esse ALT não é conteúdo do e-mail; é apenas
+                        // o texto alternativo que o navegador está exibindo.
+                        const genericBrokenAlt = /^(campanha|header(?:\s+[a-z0-9à-ÿ_-]+)?|logo|logotipo|banner|imagem|image|marca)$/i.test(altNorm);
+
+                        if (matchesSender || genericBrokenAlt) {
+                            img.style.display = 'none';
+                        }
+                    });
+                }
+
+                // Remove somente imagens realmente quebradas que exibiriam
+                // ALT genérico no topo (ex.: "Campanha", "Header Mapfre").
+                // Fazemos a verificação várias vezes porque algumas imagens só
+                // são marcadas como complete depois do primeiro load do iframe.
+                const cleanBrokenTopImages = () => {
+                    try {
+                        const senderName = String(m.from?.name || '').trim().toLowerCase();
+                        const senderWords = senderName
+                            .replace(/[^a-z0-9À-ÿ]+/gi, ' ')
+                            .split(/\s+/)
+                            .filter(w => w.length >= 3);
+                        const genericAlt = /^(campanha|header(?:\s+mapfre)?|logo|banner|imagem|image|header|marca|brand|newsletter)$/i;
+                        Array.from(doc.querySelectorAll('img')).slice(0, 12).forEach(img => {
+                            const alt = String(img.getAttribute('alt') || '').replace(/\s+/g, ' ').trim();
+                            if (!alt || alt.length > 80 || !img.complete || img.naturalWidth !== 0) return;
+                            const altNorm = alt.toLowerCase().replace(/[^a-z0-9À-ÿ]+/gi, ' ').trim();
+                            const matchesSender = senderWords.some(word =>
+                                altNorm === word || altNorm.includes(' ' + word + ' ') ||
+                                altNorm.startsWith(word + ' ') || altNorm.endsWith(' ' + word)
+                            );
+                            if (matchesSender || genericAlt.test(alt)) {
+                                img.remove();
+                            }
+                        });
+                    } catch (_) {}
+                    resizeEmail();
+                };
+
+                cleanBrokenTopImages();
+
+                /*
+                 * CORREÇÕES ESPECÍFICAS E SEGURAS
+                 *
+                 * Alguns e-mails deixam no início do HTML um texto que não é
+                 * parte do conteúdo da mensagem. No Santander, é exatamente o
+                 * assunto repetido; no MAPFRE, é o rótulo "Header Mapfre".
+                 *
+                 * Não usamos uma regra genérica aqui. Limitamos por remetente e
+                 * pelo texto exato para não correr o risco de apagar conteúdo
+                 * legítimo de outros e-mails.
+                 */
+                const cleanSpecificTopArtifacts = () => {
+                    try {
+                        const sender = (String(m.from?.name || '') + ' ' + String(m.from?.email || '')).toLowerCase();
+                        const isSantander = /santander/.test(sender);
+                        const isMapfre = /mapfre/.test(sender);
+
+                        // MAPFRE: o navegador pode mostrar "Header Mapfre" como
+                        // ALT mesmo quando a imagem não carrega. Removemos somente
+                        // esse ALT específico, sem tocar nas demais imagens.
+                        if (isMapfre) {
+                            doc.querySelectorAll('img[alt]').forEach(img => {
+                                const alt = (img.getAttribute('alt') || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                                if (alt === 'header mapfre') img.remove();
+                            });
+
+                            // Em alguns relays o mesmo rótulo chega como texto.
+                            const walker = doc.createTreeWalker(doc.body || doc.documentElement, NodeFilter.SHOW_TEXT);
+                            const nodes = [];
+                            let n;
+                            while ((n = walker.nextNode())) nodes.push(n);
+                            nodes.forEach(textNode => {
+                                if ((textNode.nodeValue || '').replace(/\s+/g, ' ').trim().toLowerCase() === 'header mapfre') {
+                                    textNode.nodeValue = '';
+                                }
+                            });
+                        }
+
+                        // SANTANDER: o assunto aparece duplicado no topo do corpo.
+                        // Apagamos somente a primeira ocorrência textual que seja
+                        // exatamente igual ao assunto, e somente neste remetente.
+                        if (isSantander) {
+                            const subjectExact = String(m.subject || '').replace(/\s+/g, ' ').trim();
+                            if (subjectExact) {
+                                const walker = doc.createTreeWalker(doc.body || doc.documentElement, NodeFilter.SHOW_TEXT);
+                                let textNode;
+                                while ((textNode = walker.nextNode())) {
+                                    const value = (textNode.nodeValue || '').replace(/\s+/g, ' ').trim();
+                                    if (value === subjectExact) {
+                                        textNode.nodeValue = '';
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (_) {}
+                    resizeEmail();
+                };
+
+                cleanSpecificTopArtifacts();
+
+                // Repetimos apenas essas duas correções específicas depois que
+                // imagens/fontes terminarem de carregar.
+                [100, 400, 1000, 2000].forEach(delay => setTimeout(cleanSpecificTopArtifacts, delay));
+
+                // Recalcula e limpa novamente quando imagens terminam de carregar
+                // ou falham.
+                doc.querySelectorAll('img').forEach(img => {
+                    img.addEventListener('load', () => { cleanBrokenTopImages(); }, { once: true });
+                    img.addEventListener('error', () => { cleanBrokenTopImages(); }, { once: true });
+                });
+                [50, 150, 300, 700, 1200, 2000].forEach(delay => setTimeout(cleanBrokenTopImages, delay));
+
+                // Recalcula se o conteúdo mudar de tamanho.
+                if (window.ResizeObserver && doc.documentElement) {
+                    const ro = new ResizeObserver(resizeEmail);
+                    ro.observe(doc.documentElement);
+                    if (doc.body) ro.observe(doc.body);
+                    iframe._emailResizeObserver = ro;
+                }
+
+                // Alguns e-mails carregam fontes depois do load.
+                [2500, 4000].forEach(delay => setTimeout(resizeEmail, delay));
+            } catch (e) {
+                [100, 500, 1200].forEach(delay => setTimeout(resizeEmail, delay));
+            }
+        });
+
+        container.appendChild(iframe);
+    } else {
+        container.style.padding = '20px';
+        container.style.whiteSpace = 'pre-wrap';
+        container.textContent = m.body || '';
+    }
+}
+
+async function loadMessageBody(m) {
+    const acc = accounts.find(a => a.email === m.from?.accountEmail) || accounts[0];
+    if (!acc) return;
+
+    // Alguns servidores IMAP/relay respondem com falha transitória na primeira
+    // tentativa, principalmente para mensagens antigas. Fazemos poucas tentativas
+    // automáticas antes de informar erro ao usuário. Isso não altera o conteúdo do e-mail.
+    const maxAttempts = 3;
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const response = await fetch(RELAY_URL + '/fetch-body', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: acc.email, password: acc.password, uid: m.uid || m.id, imapHost: m.imapHost || null })
+            });
+            const data = await response.json();
+            if (!response.ok || data.error) throw new Error(data.error || 'Falha ao carregar mensagem.');
+
+            const returnedBody = String(data.body || '').trim();
+            const returnedHtml = String(data.bodyHtml || '').trim();
+            if (!returnedBody && !returnedHtml) {
+                throw new Error('O servidor retornou o corpo da mensagem vazio.');
+            }
+            m.body = data.body || '';
+            m.bodyHtml = data.bodyHtml || null;
+            m.bodyLoaded = true;
+            saveData();
+            if (selectedMessageId === m.id) {
+                const container = document.getElementById('rdBodyContainer');
+                if (container) renderBodyInto(container, m);
+            }
+            return;
+        } catch (err) {
+            lastError = err;
+            if (attempt < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 700 * attempt));
+            }
+        }
+    }
+
+    // Não gravamos a falha como se fosse o corpo da mensagem.
+    // Caso contrário, a mensagem fica "carregada" para sempre e nunca mais
+    // tenta buscar o HTML real. Isso era responsável pelas telas vazias/erro
+    // permanente em mensagens como Manus Team e Gumroad.
+    m.bodyLoaded = false;
+    m.body = '';
+    m.bodyHtml = null;
+    if (selectedMessageId === m.id) {
+        const container = document.getElementById('rdBodyContainer');
+        if (container) {
+            container.style.whiteSpace = 'pre-wrap';
+            container.style.padding = '20px';
+            container.textContent = '❌ Não foi possível carregar o conteúdo desta mensagem. Clique novamente na mensagem para tentar outra vez.';
+        }
+    }
+}
+
+function refreshUI() { updateExplorer(); renderList(); renderReading(); saveData(); }
+function switchView(view) { currentView = view; selectedMessageId = null; refreshUI(); }
+function selectMessage(id) { selectedMessageId = id; const m = messages.find(msg => msg.id === id); if (m && !m.read) { m.read = true; saveData(); } refreshUI(); }
+
+// ============================================================
+// SINCRONIZAÇÃO REAL VIA RELAY PRÓPRIO — TODAS AS CONTAS
+// ============================================================
+async function syncMessages() {
+    if (accounts.length === 0) {
+        document.getElementById('statusText').textContent = '❌ Nenhuma conta configurada. Vá em Configurações > Contas.';
+        return;
+    }
+    for (const acc of accounts) {
+        await syncAccount(acc);
+    }
+    refreshUI();
+}
+
+async function syncAccount(acc) {
+    document.getElementById('statusText').textContent = `🔄 Sincronizando ${acc.email}...`;
+
+    const domain = acc.email.split('@')[1] || '';
+    const knownProviders = {
+        'gmail.com': 'imap.gmail.com',
+        'googlemail.com': 'imap.gmail.com',
+        'outlook.com': 'outlook.office365.com',
+        'hotmail.com': 'outlook.office365.com',
+        'live.com': 'outlook.office365.com',
+        'yahoo.com': 'imap.mail.yahoo.com',
+        'yahoo.com.br': 'imap.mail.yahoo.com',
+        'aol.com': 'imap.aol.com',
+        'icloud.com': 'imap.mail.me.com',
+        'me.com': 'imap.mail.me.com',
+        'mac.com': 'imap.mail.me.com',
+        'zoho.com': 'imap.zoho.com',
+        'protonmail.com': 'imap.protonmail.com',
+        'protonmail.ch': 'imap.protonmail.com',
+        'unesp.br': 'imap.gmail.com' // UNESP roda o e-mail institucional no Google Workspace
+    };
+
+    // Para provedores conhecidos, usa direto o host certo. Para domínios próprios, tenta os padrões mais comuns.
+    const hostsToTry = knownProviders[domain]
+        ? [knownProviders[domain]]
+        : ['mail.' + domain, 'imap.' + domain, domain];
+
+    let lastErrorMsg = '';
+    for (const imapHost of hostsToTry) {
+        try {
+            document.getElementById('statusText').textContent = `📡 ${acc.email}: tentando ${imapHost}...`;
+            const response = await fetch(RELAY_URL + '/fetch-emails', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: acc.email, password: acc.password, imapHost })
+            });
+            const data = await response.json();
+            if (!response.ok || data.error) { lastErrorMsg = data.error || 'Falha na conexão.'; continue; }
+            processEmails(data, acc, imapHost);
+            document.getElementById('statusText').textContent = `✅ ${acc.email} sincronizada!`;
+            return;
+        } catch (err) {
+            lastErrorMsg = err.message || String(err);
+        }
+    }
+
+    const isAuthError = /invalid credentials|auth|login|senha|password|unauthorized/i.test(lastErrorMsg);
+    const hint = isAuthError
+        ? ' Gmail e Outlook/Hotmail não aceitam mais a senha normal — é preciso gerar uma "senha de aplicativo" nas configurações de segurança da conta (com verificação em duas etapas ativada) e usar ela aqui.'
+        : '';
+    document.getElementById('statusText').textContent = `❌ ${acc.email}: ${lastErrorMsg}${hint}`;
+    if (isAuthError) {
+        showAlert(
+            'Não foi possível entrar em ' + acc.email,
+            'O provedor recusou o e-mail/senha informados.\n\n' +
+            'Gmail e Outlook/Hotmail exigem uma "senha de aplicativo" em vez da senha normal da conta ' +
+            '(é preciso ativar a verificação em duas etapas primeiro). Gere uma senha de app e recadastre essa conta com ela.'
+        );
+    } else {
+        showAlert(
+            'Falha ao sincronizar ' + acc.email,
+            lastErrorMsg || 'Não foi possível conectar ao servidor de e-mail. Verifique sua internet e tente novamente.'
+        );
+    }
+}
+
+function processEmails(data, acc, imapHost) {
+    // Remove as mensagens antigas dessa mesma conta antes de adicionar as novas (evita duplicar ao ressincronizar)
+    messages = messages.filter(m => m.from?.accountEmail !== acc.email);
+    const newOnes = data.emails.map(email => ({
+        id: acc.email + ':' + email.id,
+        uid: email.id,
+        from: { name: email.fromName || email.from, email: email.from, accountEmail: acc.email },
+        to: [{ name: acc.name || 'Você', email: acc.email }],
+        subject: email.subject,
+        body: '',
+        bodyHtml: null,
+        bodyLoaded: false,
+        imapHost: imapHost,
+        date: new Date(email.date).getTime(),
+        read: !!email.read,
+        favorite: false,
+        folder: 'inbox',
+        labels: []
+    }));
+    messages = messages.concat(newOnes);
+}
+
+function openCompose() {
+    showInput('Nova Mensagem', 'Para:', '', 'email@exemplo.com', function(to) {
+        if (to !== null && to.trim() !== '') {
+            showInput('Assunto', '', '', 'Assunto da mensagem', function(subject) {
+                if (subject !== null) {
+                    showInput('Mensagem', '', '', 'Digite sua mensagem...', function(body) {
+                        if (body !== null) {
+                            messages.push({ id: Date.now().toString(36), from: { name: 'Você', email: 'local@drimah.local' }, to: [{ name: to, email: to }], subject: subject || '(sem assunto)', body: body || '...', date: Date.now(), read: true, favorite: false, folder: 'sent', labels: [] });
+                            refreshUI();
+                        }
+                    });
+                };
+
+                cleanBrokenTopAlt();
+                // Alguns servidores/relays carregam as imagens depois do load.
+                // Repetimos apenas esta limpeza leve, sem alterar o HTML do e-mail.
+                [500, 1500, 3000].forEach(delay => setTimeout(() => {
+                    try { cleanBrokenTopAlt(); resizeEmail(); } catch (e) {}
+                }, delay));
+            });
+        }
+    });
+}
+
+function replyMessage() { if (!selectedMessageId) return; const m = messages.find(msg => msg.id === selectedMessageId); if (!m) return; openCompose(); }
+function forwardMessage() { if (!selectedMessageId) return; const m = messages.find(msg => msg.id === selectedMessageId); if (!m) return; openCompose(); }
+function archiveMessage() { if (!selectedMessageId) return; const m = messages.find(msg => msg.id === selectedMessageId); if (m) { m.folder = 'archived'; selectedMessageId = null; refreshUI(); } }
+function spamMessage() { if (!selectedMessageId) return; const m = messages.find(msg => msg.id === selectedMessageId); if (m) { m.folder = 'spam'; selectedMessageId = null; refreshUI(); } }
+function deleteMessage() {
+    if (!selectedMessageId) return;
+    const m = messages.find(msg => msg.id === selectedMessageId);
+    if (!m) return;
+    showConfirm('Excluir', 'Mover para a lixeira? Isso também vai apagar o e-mail no servidor.', 'OK', 'Cancelar', function(result) {
+        if (!result) return;
+        m.folder = 'trash';
+        selectedMessageId = null;
+        refreshUI();
+        deleteMessageOnServer(m);
+    });
+}
+
+async function deleteMessageOnServer(m) {
+    const acc = accounts.find(a => a.email === m.from?.accountEmail);
+    if (!acc) return;
+    try {
+        const response = await fetch(RELAY_URL + '/delete-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: acc.email, password: acc.password, uid: m.uid || m.id, imapHost: m.imapHost || null })
+        });
+        const data = await response.json();
+        if (!response.ok || data.error) throw new Error(data.error || 'Falha ao excluir no servidor.');
+    } catch (err) {
+        showAlert('Excluído só localmente', 'A mensagem foi movida para a lixeira aqui no app, mas não foi possível excluir no servidor: ' + (err.message || err));
+    }
+}
+function toggleFavorite() { if (!selectedMessageId) return; const m = messages.find(msg => msg.id === selectedMessageId); if (m) { m.favorite = !m.favorite; refreshUI(); } }
+function toggleLabel() { if (!selectedMessageId) return; const m = messages.find(msg => msg.id === selectedMessageId); if (m && labels.length > 0) { const l = labels[0].id; m.labels = (m.labels || []).includes(l) ? m.labels.filter(x => x !== l) : [...(m.labels || []), l]; refreshUI(); } }
+function printCurrent() {
+    if (!selectedMessageId) return;
+
+    const m = messages.find(msg => msg.id === selectedMessageId);
+    if (!m) return;
+
+    /*
+     * Impressão dedicada: cria um iframe fora da interface, coloca somente
+     * o HTML sanitizado do e-mail nele e manda imprimir esse documento.
+     * A aplicação nunca recebe window.print(), portanto lista, menus e
+     * barra lateral não entram na impressão.
+     */
+    let html = currentEmailHtml;
+
+    if (!html && m.bodyHtml) {
+        html = sanitizeEmailHtml(m.bodyHtml, m);
+    }
+
+    if (html) {
+        const printFrame = document.createElement('iframe');
+        printFrame.setAttribute('title', 'Impressão do e-mail');
+        printFrame.sandbox = 'allow-same-origin allow-modals';
+        printFrame.style.position = 'fixed';
+        printFrame.style.left = '-10000px';
+        printFrame.style.top = '0';
+        printFrame.style.width = '1px';
+        printFrame.style.height = '1px';
+        printFrame.style.border = '0';
+        printFrame.style.visibility = 'hidden';
+        printFrame.style.pointerEvents = 'none';
+
+        const printCss = `<style id="drimah-print-css">
+@page { size: A4 portrait; margin: 12mm; }
+html, body {
+    width: auto !important;
+    min-height: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+}
+body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+img { max-width: 100% !important; height: auto !important; }
+</style>`;
+
+        if (/<head[^>]*>/i.test(html)) {
+            html = html.replace(/<head[^>]*>/i, match => match + printCss);
+        } else {
+            html = html.replace(/<html[^>]*>/i, match => match + '<head>' + printCss + '</head>');
+        }
+
+        document.body.appendChild(printFrame);
+
+        let printed = false;
+        const cleanup = () => {
+            if (printFrame.parentNode) printFrame.parentNode.removeChild(printFrame);
+        };
+
+        printFrame.addEventListener('load', () => {
+            const win = printFrame.contentWindow;
+            const doc = printFrame.contentDocument;
+            if (!win || !doc) {
+                cleanup();
+                return;
+            }
+
+            const images = Array.from(doc.images || []);
+            const pending = images.filter(img => !img.complete);
+
+            const doPrint = () => {
+                if (printed) return;
+                printed = true;
+                try {
+                    win.focus();
+                    win.print();
+                } finally {
+                    setTimeout(cleanup, 1000);
+                }
+            };
+
+            if (pending.length === 0) {
+                setTimeout(doPrint, 200);
+            } else {
+                let remaining = pending.length;
+                const done = () => {
+                    remaining--;
+                    if (remaining <= 0) doPrint();
+                };
+                pending.forEach(img => {
+                    img.addEventListener('load', done, { once: true });
+                    img.addEventListener('error', done, { once: true });
+                });
+                setTimeout(doPrint, 3000);
+            }
+        }, { once: true });
+
+        printFrame.srcdoc = html;
+        return;
+    }
+
+    // Texto puro: também imprime somente o conteúdo da mensagem.
+    const w = window.open('', '_blank', 'width=900,height=700');
+    if (!w) {
+        showAlert('Impressão', 'O navegador bloqueou a janela de impressão. Permita pop-ups para o Drimah Emails e tente novamente.');
+        return;
+    }
+
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${escapeHtml(m.subject || 'E-mail')}</title><style>@page{size:A4 portrait;margin:12mm}body{font-family:Arial,sans-serif;white-space:pre-wrap;padding:20px;color:#111}</style></head><body>${escapeHtml(m.body || '')}</body></html>`);
+    w.document.close();
+    w.focus();
+    setTimeout(() => w.print(), 150);
+}
+
+function newFile() { showConfirm('Novo Projeto', 'Criar novo projeto? Os dados atuais serão perdidos.', 'OK', 'Cancelar', function(result) { if (result) { messages = []; labels = []; accounts = []; signatures = []; currentView = 'inbox'; selectedMessageId = null; refreshUI(); } }); }
+function openFile() { document.getElementById('fileInput').click(); }
+function handleFileOpen(event) { const file = event.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = function(e) { try { const data = JSON.parse(e.target.result); messages = data.messages || []; labels = data.labels || []; accounts = data.accounts || []; signatures = data.signatures || []; currentView = data.currentView || 'inbox'; refreshUI(); } catch (err) { showAlert('Erro', 'Arquivo inválido.'); } }; reader.readAsText(file); event.target.value = ''; }
+function saveFile() { const data = { messages, labels, accounts, signatures, currentView }; const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'drimah_emails_backup.json'; a.click(); URL.revokeObjectURL(url); }
+function saveFileAs() { saveFile(); }
+function printFullProject() { window.print(); }
+function closeApp() { showConfirm('Sair', 'Deseja realmente sair?', 'Sair', 'Cancelar', function(result) { if (result) window.close(); }); }
+
+function showModal(title, bodyHTML) { document.getElementById('modalTitle').textContent = title; document.getElementById('modalContent').innerHTML = bodyHTML; document.getElementById('modalOverlay').classList.add('active'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+
+function openAccounts() {
+    let html = '<div style="padding: 10px;">';
+    if (accounts.length === 0) { html += '<p style="text-align:center;color:var(--text-3);">Nenhuma conta cadastrada.</p>'; } else {
+        accounts.forEach(acc => { html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);"><div><b>${acc.name}</b><br><small style="color:var(--text-3);">${acc.email}</small></div><button class="icbtn danger" onclick="deleteAccount('${acc.id}')">✕</button></div>`; });
+    }
+    html += `<div style="margin-top:16px;display:grid;gap:12px;"><input id="acc-name" class="input" placeholder="Nome da conta..." style="width:100%;padding:14px 16px;"><input id="acc-email" class="input" placeholder="Endereço de e-mail..." style="width:100%;padding:14px 16px;"><div style="display:flex;gap:12px;align-items:center;width:100%;"><input id="acc-pass" class="input" type="password" placeholder="Senha..." style="flex:1;padding:14px 16px;"><div style="display:flex;align-items:center;gap:6px;cursor:pointer;"><input type="checkbox" id="showPass" style="width:18px;height:18px;accent-color:var(--accent);cursor:pointer;" onchange="document.getElementById('acc-pass').type = this.checked ? 'text' : 'password';"><label for="showPass" style="color:var(--text-3);font-size:13px;cursor:pointer;user-select:none;">Mostrar senha</label></div></div><button id="btn-add-account" class="btn btn-primary" style="width:100%;padding:14px 24px;margin-top:8px;">Adicionar Conta</button></div></div>`;
+    showModal('Gerenciar Contas', html);
+    setTimeout(() => {
+        document.getElementById('btn-add-account').addEventListener('click', function() {
+            const name = document.getElementById('acc-name').value.trim();
+            const email = document.getElementById('acc-email').value.trim();
+            const password = document.getElementById('acc-pass').value.trim();
+            if (name && email && password) {
+                accounts.push({ id: Date.now().toString(36), name, email, password });
+                saveData();
+                closeModal();
+                showAlert('Sucesso', 'Conta adicionada! Clique em Sincronizar.');
+                refreshUI();
+            } else { showAlert('Aviso', 'Preencha nome, e-mail e senha.'); }
+        });
+    }, 100);
+}
+function deleteAccount(id) {
+    const acc = accounts.find(a => a.id === id);
+    accounts = accounts.filter(a => a.id !== id);
+    if (acc) {
+        messages = messages.filter(m => m.from?.accountEmail !== acc.email);
+        if (currentAccountFilter === acc.email) currentAccountFilter = 'all';
+    }
+    saveData();
+    refreshUI();
+    openAccounts();
+}
+function openLabels() { showInput('Novo Marcador', 'Digite o nome do marcador:', '', 'Nome do marcador', function(name) { if (name !== null && name.trim() !== '') { labels.push({ id: Date.now().toString(36), name: name.trim(), color: '#f57900' }); saveData(); refreshUI(); } }); }
+function openSignatures() { showAlert('Aviso', 'Funcionalidade de assinaturas em breve.'); }
+function toggleExplorer() { const exp = document.getElementById('explorer'); exp.style.display = exp.style.display === 'none' ? 'flex' : 'none'; }
+function toggleTheme() { const current = localStorage.getItem('drimah_theme') || 'default'; const themeList = Object.keys(themes); const idx = themeList.indexOf(current); const next = themeList[(idx + 1) % themeList.length]; applyTheme(next); }
+function showAbout() {
+    const logoImg = document.getElementById('headerLogo');
+    const logoSrc = logoImg ? logoImg.src : 'drimahemails.png';
+    showModal('Sobre', `<div class="modal-about-logo"><img src="${logoSrc}" alt="Logo Drimah Emails"></div><div style="text-align:center;"><div class="modal-about-title"><span class="modal-about-accent">Drimah</span> Emails</div><p style="color:var(--text-3);margin-top:8px;">Módulo de e-mail da Drimah Suite.</p><p style="margin-top:12px;"><b>Desenvolvido por</b> Drimah Technology.</p><p style="text-align:center;margin-top:16px"><a href="https://github.com/drimah" target="_blank" class="modal-about-link"><svg class="icon icon-sm" style="stroke:#fff;" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>github.com/drimah</a></p></div>`);
+}
+
+function init() {
+    const savedLang = loadSavedLanguage();
+    setLanguage(savedLang);
+    loadSavedTheme();
+    loadData();
+    if (messages.length === 0) {
+        messages.push({ id: 'welcome', from: { name: 'Drimah Suite', email: 'suite@drimah.local' }, to: [{ name: 'Você', email: 'user@local' }], subject: 'Bem-vindo ao Drimah Emails', body: 'Este é o Drimah Emails. Configure sua conta em Configurações > Contas e clique em Sincronizar para ler seus e-mails REAIS do servidor.', date: Date.now(), read: false, favorite: false, folder: 'inbox', labels: [] });
+    }
+    refreshUI();
+}
+init();
+</script>
+</body>
+</html>
